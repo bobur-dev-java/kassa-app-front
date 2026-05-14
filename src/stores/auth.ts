@@ -7,7 +7,7 @@ import {
   normalizeRole,
   tokenStorage,
 } from '@/services/api'
-import type { LoginRequest, YaTTUserRole } from '@/types/api'
+import type { LoginRequest, LoginYattRes, YaTTUserRole } from '@/types/api'
 
 export const useAuthStore = defineStore('auth', () => {
   const accessToken = ref(tokenStorage.getAccessToken())
@@ -18,12 +18,22 @@ export const useAuthStore = defineStore('auth', () => {
   )
   const userId = ref(claims?.userId ?? tokenStorage.getUserId())
   const yattId = ref(claims?.yattId ?? tokenStorage.getYattId())
+  const yattRes = ref<LoginYattRes[]>(tokenStorage.getLoginYatts())
   const isAuthenticated = computed(() => Boolean(accessToken.value))
 
   window.addEventListener(AUTH_CHANGED_EVENT, syncFromStorage)
 
   async function login(payload: LoginRequest) {
     const response = await authApi.login(payload)
+
+    tokenStorage.setAuth(response)
+    applyAuth(response.accessToken, response.refreshToken)
+
+    return response
+  }
+
+  async function selectYatt(selectedYattId: number) {
+    const response = await authApi.selectYatt(selectedYattId)
 
     tokenStorage.setAuth(response)
     applyAuth(response.accessToken, response.refreshToken)
@@ -53,6 +63,7 @@ export const useAuthStore = defineStore('auth', () => {
     role.value = normalizeRole(newClaims?.role)
     userId.value = newClaims?.userId ?? null
     yattId.value = newClaims?.yattId ?? null
+    yattRes.value = tokenStorage.getLoginYatts()
   }
 
   function syncFromStorage() {
@@ -65,6 +76,7 @@ export const useAuthStore = defineStore('auth', () => {
       role.value = null
       userId.value = null
       yattId.value = null
+      yattRes.value = []
       return
     }
 
@@ -78,6 +90,7 @@ export const useAuthStore = defineStore('auth', () => {
     role.value = null
     userId.value = null
     yattId.value = null
+    yattRes.value = []
   }
 
   return {
@@ -86,8 +99,10 @@ export const useAuthStore = defineStore('auth', () => {
     role,
     userId,
     yattId,
+    yattRes,
     isAuthenticated,
     login,
+    selectYatt,
     refreshAccessToken,
     logout,
   }

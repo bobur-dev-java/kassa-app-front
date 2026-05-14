@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, onMounted, reactive, ref } from 'vue'
 import { useRouter } from 'vue-router'
+import YattSwitcher from '@/components/YattSwitcher.vue'
 import { adminApi, ApiError, authApi } from '@/services/api'
 import { useAuthStore } from '@/stores/auth'
 import type { SystemInfoResponse, YaTTUserRole, YattResponse } from '@/types/api'
@@ -128,7 +129,10 @@ function getErrorMessage(error: unknown, fallback: string) {
           {{ auth.role ?? 'ROLE' }} · User #{{ auth.userId ?? '-' }} · YATT #{{ auth.yattId ?? '-' }}
         </span>
       </div>
-      <button class="ghost-button" type="button" @click="logout">Chiqish</button>
+      <div class="topbar-actions">
+        <YattSwitcher @switched="loadDashboard" />
+        <button class="ghost-button" type="button" @click="logout">Chiqish</button>
+      </div>
     </header>
 
     <section class="stats-grid">

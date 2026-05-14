@@ -235,6 +235,42 @@ h2 {
   padding: 8px 2px 4px;
 }
 
+.topbar-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.yatt-switcher {
+  display: grid;
+  gap: 5px;
+  min-width: 180px;
+}
+
+.yatt-switcher select {
+  min-height: 40px;
+  max-width: 240px;
+  border: 1px solid rgba(23, 32, 38, 0.12);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.9);
+  color: var(--tg-theme-text-color, #172026);
+  padding: 0 11px;
+  font-weight: 800;
+  outline: none;
+}
+
+.yatt-switcher select:focus {
+  border-color: #127c64;
+  box-shadow: 0 0 0 3px rgba(18, 124, 100, 0.12);
+}
+
+.yatt-switcher-error {
+  color: #b42318;
+  font-size: 12px;
+  font-weight: 700;
+}
+
 .stats-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -342,6 +378,22 @@ button.list-card:focus-visible {
 }
 
 @media (max-width: 460px) {
+  .topbar {
+    align-items: flex-start;
+  }
+
+  .topbar-actions {
+    width: 100%;
+    justify-content: stretch;
+  }
+
+  .topbar-actions .ghost-button,
+  .yatt-switcher,
+  .yatt-switcher select {
+    width: 100%;
+    max-width: none;
+  }
+
   .mini-grid,
   .product-row {
     grid-template-columns: 1fr;

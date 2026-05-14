@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, onMounted, reactive, ref } from 'vue'
 import { useRouter } from 'vue-router'
+import YattSwitcher from '@/components/YattSwitcher.vue'
 import { ApiError, smallSellerApi } from '@/services/api'
 import { useAuthStore } from '@/stores/auth'
 import type {
@@ -437,7 +438,10 @@ function money(value: number) {
         <p>Small seller</p>
         <h1>{{ profile?.fullName ?? 'Savdo' }}</h1>
       </div>
-      <button class="ghost-button" type="button" @click="logout">Chiqish</button>
+      <div class="topbar-actions">
+        <YattSwitcher @switched="loadDashboard" />
+        <button class="ghost-button" type="button" @click="logout">Chiqish</button>
+      </div>
     </header>
 
     <nav class="tabs">

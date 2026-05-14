@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, onMounted, reactive, ref } from 'vue'
 import { useRouter } from 'vue-router'
+import YattSwitcher from '@/components/YattSwitcher.vue'
 import { ApiError, bigSellerApi } from '@/services/api'
 import { useAuthStore } from '@/stores/auth'
 import type {
@@ -84,6 +85,34 @@ async function loadDashboard() {
     users.value = usersResponse
     productForm.toUserId = productForm.toUserId ?? usersResponse[0]?.id ?? null
     await Promise.all([loadProducts(), loadMoney(), loadDebits()])
+  }, false)
+}
+
+async function handleYattSwitched() {
+  productTransactions.value = []
+  moneyTransactions.value = []
+  debits.value = []
+  selectedProductTransaction.value = null
+  selectedMoneyTransaction.value = null
+  productMode.value = 'list'
+  moneyMode.value = 'list'
+  productForm.toUserId = null
+  commonFilter.fromUserId = null
+  commonFilter.toUserId = null
+
+  await runAction(async () => {
+    const [profileResponse, usersResponse] = await Promise.all([
+      bigSellerApi.getProfile(),
+      bigSellerApi.getUsers(),
+    ])
+
+    profile.value = profileResponse
+    profileForm.fullName = profileResponse.fullName
+    profileForm.username = profileResponse.username
+    users.value = usersResponse
+    productForm.toUserId = usersResponse[0]?.id ?? null
+
+    await refreshActiveList()
   }, false)
 }
 
@@ -358,7 +387,10 @@ function money(value: number) {
         <p>Big seller</p>
         <h1>{{ profile?.fullName ?? 'Savdo' }}</h1>
       </div>
-      <button class="ghost-button" type="button" @click="logout">Chiqish</button>
+      <div class="topbar-actions">
+        <YattSwitcher @switched="handleYattSwitched" />
+        <button class="ghost-button" type="button" @click="logout">Chiqish</button>
+      </div>
     </header>
 
     <nav class="tabs">

@@ -11,14 +11,22 @@ export type YattResponse = {
 }
 
 export type LoginRequest = {
-  yattId: number
   username: string
   password: string
+}
+
+export type LoginYattRes = {
+  id?: number
+  yattId?: number
+  name: string
+  role: YaTTUserRole | string
 }
 
 export type LoginResponse = {
   accessToken: string
   refreshToken: string
+  activeYattId?: number
+  yattRes?: LoginYattRes[]
   role?: YaTTUserRole
 }
 

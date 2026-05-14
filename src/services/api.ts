@@ -9,6 +9,7 @@ import type {
   KassaResponse,
   LoginRequest,
   LoginResponse,
+  LoginYattRes,
   MoneyTransactionFilter,
   MoneyTransactionRequest,
   MoneyTransactionResponse,
@@ -32,6 +33,7 @@ const REFRESH_TOKEN_KEY = 'kassa_refresh_token'
 const ROLE_KEY = 'kassa_user_role'
 const USER_ID_KEY = 'kassa_user_id'
 const YATT_ID_KEY = 'kassa_yatt_id'
+const LOGIN_YATTS_KEY = 'kassa_login_yatts'
 export const AUTH_CHANGED_EVENT = 'kassa-auth-changed'
 let refreshPromise: Promise<LoginResponse | null> | null = null
 
@@ -61,9 +63,11 @@ export const tokenStorage = {
   getRole: () => localStorage.getItem(ROLE_KEY),
   getUserId: () => Number(localStorage.getItem(USER_ID_KEY)) || null,
   getYattId: () => Number(localStorage.getItem(YATT_ID_KEY)) || null,
+  getLoginYatts: () => safeJsonParse(localStorage.getItem(LOGIN_YATTS_KEY) ?? '[]') as LoginYattRes[],
   setAuth: (response: LoginResponse) => {
     const claims = decodeJwtPayload(response.accessToken)
     const role = normalizeRole(response.role ?? claims?.role)
+    const yattId = claims?.yattId ?? response.activeYattId
 
     localStorage.setItem(ACCESS_TOKEN_KEY, response.accessToken)
     localStorage.setItem(REFRESH_TOKEN_KEY, response.refreshToken)
@@ -76,8 +80,12 @@ export const tokenStorage = {
       localStorage.setItem(USER_ID_KEY, String(claims.userId))
     }
 
-    if (claims?.yattId) {
-      localStorage.setItem(YATT_ID_KEY, String(claims.yattId))
+    if (yattId) {
+      localStorage.setItem(YATT_ID_KEY, String(yattId))
+    }
+
+    if (response.yattRes) {
+      localStorage.setItem(LOGIN_YATTS_KEY, JSON.stringify(response.yattRes))
     }
 
     window.dispatchEvent(new Event(AUTH_CHANGED_EVENT))
@@ -88,6 +96,7 @@ export const tokenStorage = {
     localStorage.removeItem(ROLE_KEY)
     localStorage.removeItem(USER_ID_KEY)
     localStorage.removeItem(YATT_ID_KEY)
+    localStorage.removeItem(LOGIN_YATTS_KEY)
     window.dispatchEvent(new Event(AUTH_CHANGED_EVENT))
   },
 }
@@ -274,12 +283,16 @@ async function downloadFile(path: string, filename: string) {
 }
 
 export const authApi = {
-  getAllYatt: () => apiResponse<YattResponse[]>('/api/auth/all-yatt', { auth: false }),
+  getAllYatt: () => apiResponse<YattResponse[]>('/api/auth/all-yatt'),
   login: (body: LoginRequest) =>
     apiResponse<LoginResponse>('/api/auth/login', {
       method: 'POST',
       body,
       auth: false,
+    }),
+  selectYatt: (yattId: number) =>
+    apiResponse<LoginResponse>(withQuery('/api/auth/select-yatt', { yattId }), {
+      method: 'POST',
     }),
   getAccessToken: (body: AccessTokenRequest) =>
     apiResponse<LoginResponse>('/api/auth/access-token', {

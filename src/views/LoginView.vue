@@ -1,40 +1,41 @@
 <script setup lang="ts">
-import { computed, onMounted, ref } from 'vue'
+import { computed, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { getHomeRouteName } from '@/router'
-import { ApiError, authApi } from '@/services/api'
+import { ApiError } from '@/services/api'
 import { useAuthStore } from '@/stores/auth'
-import type { YattResponse } from '@/types/api'
+import type { LoginYattRes } from '@/types/api'
 
 const router = useRouter()
 const auth = useAuthStore()
 
-const yattList = ref<YattResponse[]>([])
-const yattId = ref<number | null>(null)
 const username = ref('')
 const password = ref('')
-const isLoadingYatt = ref(false)
+const yattList = ref<LoginYattRes[]>([])
+const selectedYattId = ref<number | null>(null)
 const isSubmitting = ref(false)
+const isSelectingYatt = ref(false)
 const errorMessage = ref('')
 
-const canSubmit = computed(() => yattId.value && username.value.trim() && password.value.trim())
+const isYattStep = computed(() => yattList.value.length > 1)
+const canSubmit = computed(() => username.value.trim() && password.value.trim())
+const canSelectYatt = computed(() => Boolean(selectedYattId.value))
 
-onMounted(async () => {
-  isLoadingYatt.value = true
-  errorMessage.value = ''
+function getLoginYattId(yatt: LoginYattRes) {
+  return yatt.yattId ?? yatt.id ?? null
+}
 
-  try {
-    yattList.value = await authApi.getAllYatt()
-    yattId.value = yattList.value[0]?.id ?? null
-  } catch (error) {
-    errorMessage.value = getErrorMessage(error, 'YATT royxatini olib bolmadi')
-  } finally {
-    isLoadingYatt.value = false
-  }
-})
+function getLoginYattKey(yatt: LoginYattRes) {
+  return getLoginYattId(yatt) ?? `${yatt.name}-${yatt.role}`
+}
+
+function setYatts(yatts: LoginYattRes[] = []) {
+  yattList.value = yatts
+  selectedYattId.value = yatts[0] ? getLoginYattId(yatts[0]) : null
+}
 
 async function submitLogin() {
-  if (!canSubmit.value || !yattId.value) {
+  if (!canSubmit.value) {
     return
   }
 
@@ -42,16 +43,40 @@ async function submitLogin() {
   errorMessage.value = ''
 
   try {
-    await auth.login({
-      yattId: yattId.value,
+    const response = await auth.login({
       username: username.value.trim(),
       password: password.value,
     })
+
+    setYatts(response.yattRes)
+
+    if ((response.yattRes?.length ?? 0) > 1) {
+      return
+    }
+
     await router.push({ name: getHomeRouteName(auth.role) })
   } catch (error) {
     errorMessage.value = getErrorMessage(error, 'Login yoki parol notogri')
   } finally {
     isSubmitting.value = false
+  }
+}
+
+async function submitYatt() {
+  if (!selectedYattId.value) {
+    return
+  }
+
+  isSelectingYatt.value = true
+  errorMessage.value = ''
+
+  try {
+    await auth.selectYatt(selectedYattId.value)
+    await router.push({ name: getHomeRouteName(auth.role) })
+  } catch (error) {
+    errorMessage.value = getErrorMessage(error, 'YATT tanlashda xatolik yuz berdi')
+  } finally {
+    isSelectingYatt.value = false
   }
 }
 
@@ -75,17 +100,7 @@ function getErrorMessage(error: unknown, fallback: string) {
         </div>
       </div>
 
-      <form class="form" @submit.prevent="submitLogin">
-        <label class="field">
-          <span>YATT</span>
-          <select v-model.number="yattId" :disabled="isLoadingYatt || isSubmitting">
-            <option v-if="isLoadingYatt" :value="null">Yuklanmoqda...</option>
-            <option v-for="yatt in yattList" :key="yatt.id" :value="yatt.id">
-              {{ yatt.name }}
-            </option>
-          </select>
-        </label>
-
+      <form v-if="!isYattStep" class="form" @submit.prevent="submitLogin">
         <label class="field">
           <span>Username</span>
           <input
@@ -112,6 +127,23 @@ function getErrorMessage(error: unknown, fallback: string) {
 
         <button class="primary-button" type="submit" :disabled="!canSubmit || isSubmitting">
           {{ isSubmitting ? 'Kirilmoqda...' : 'Kirish' }}
+        </button>
+      </form>
+
+      <form v-else class="form" @submit.prevent="submitYatt">
+        <label class="field">
+          <span>YATT</span>
+          <select v-model.number="selectedYattId" :disabled="isSelectingYatt">
+            <option v-for="yatt in yattList" :key="getLoginYattKey(yatt)" :value="getLoginYattId(yatt)">
+              {{ yatt.name }} - {{ yatt.role }}
+            </option>
+          </select>
+        </label>
+
+        <p v-if="errorMessage" class="alert">{{ errorMessage }}</p>
+
+        <button class="primary-button" type="submit" :disabled="!canSelectYatt || isSelectingYatt">
+          {{ isSelectingYatt ? 'Tanlanmoqda...' : 'Davom etish' }}
         </button>
       </form>
     </section>
