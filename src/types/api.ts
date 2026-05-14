@@ -15,6 +15,14 @@ export type LoginRequest = {
   password: string
 }
 
+export type TelegramLoginRequest = {
+  initData: string
+}
+
+export type TelegramConnectResponse = {
+  botLink: string
+}
+
 export type LoginYattRes = {
   id?: number
   yattId?: number

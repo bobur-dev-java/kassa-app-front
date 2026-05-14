@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, onMounted, reactive, ref } from 'vue'
 import { useRouter } from 'vue-router'
+import TelegramConnectButton from '@/components/TelegramConnectButton.vue'
 import YattSwitcher from '@/components/YattSwitcher.vue'
 import { adminApi, ApiError, authApi } from '@/services/api'
 import { useAuthStore } from '@/stores/auth'
@@ -131,6 +132,10 @@ function getErrorMessage(error: unknown, fallback: string) {
       </div>
       <div class="topbar-actions">
         <YattSwitcher @switched="loadDashboard" />
+        <TelegramConnectButton
+          @success="(message) => { actionMessage = message; actionError = '' }"
+          @error="(message) => { actionError = message; actionMessage = '' }"
+        />
         <button class="ghost-button" type="button" @click="logout">Chiqish</button>
       </div>
     </header>

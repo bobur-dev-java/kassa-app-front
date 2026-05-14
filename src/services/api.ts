@@ -19,6 +19,8 @@ import type {
   ProductTransactionResponse,
   StaffCreateRequest,
   SystemInfoResponse,
+  TelegramConnectResponse,
+  TelegramLoginRequest,
   UserCreateRequest,
   UserProfileResponse,
   UserResponse,
@@ -27,7 +29,7 @@ import type {
   YattResponse,
 } from '@/types/api'
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:8080'
+const API_BASE_URL = (import.meta.env.VITE_API_BASE_URL ?? '').replace(/\/$/, '')
 const ACCESS_TOKEN_KEY = 'kassa_access_token'
 const REFRESH_TOKEN_KEY = 'kassa_refresh_token'
 const ROLE_KEY = 'kassa_user_role'
@@ -68,6 +70,11 @@ export const tokenStorage = {
     const claims = decodeJwtPayload(response.accessToken)
     const role = normalizeRole(response.role ?? claims?.role)
     const yattId = claims?.yattId ?? response.activeYattId
+
+    localStorage.removeItem(ROLE_KEY)
+    localStorage.removeItem(USER_ID_KEY)
+    localStorage.removeItem(YATT_ID_KEY)
+    localStorage.removeItem(LOGIN_YATTS_KEY)
 
     localStorage.setItem(ACCESS_TOKEN_KEY, response.accessToken)
     localStorage.setItem(REFRESH_TOKEN_KEY, response.refreshToken)
@@ -142,7 +149,7 @@ export function isJwtExpired(token: string | null) {
   const claims = decodeJwtPayload(token)
 
   if (!claims?.exp) {
-    return false
+    return true
   }
 
   return claims.exp * 1000 <= Date.now()
@@ -289,6 +296,16 @@ export const authApi = {
       method: 'POST',
       body,
       auth: false,
+    }),
+  telegramLogin: (body: TelegramLoginRequest) =>
+    apiResponse<LoginResponse>('/api/auth/login/telegram', {
+      method: 'POST',
+      body,
+      auth: false,
+    }),
+  createTelegramConnectToken: () =>
+    request<TelegramConnectResponse>('/api/auth/telegram/connect-token', {
+      method: 'POST',
     }),
   selectYatt: (yattId: number) =>
     apiResponse<LoginResponse>(withQuery('/api/auth/select-yatt', { yattId }), {

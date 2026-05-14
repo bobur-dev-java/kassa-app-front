@@ -7,7 +7,7 @@ import {
   normalizeRole,
   tokenStorage,
 } from '@/services/api'
-import type { LoginRequest, LoginYattRes, YaTTUserRole } from '@/types/api'
+import type { LoginRequest, LoginYattRes, TelegramLoginRequest, YaTTUserRole } from '@/types/api'
 
 export const useAuthStore = defineStore('auth', () => {
   const accessToken = ref(tokenStorage.getAccessToken())
@@ -25,6 +25,15 @@ export const useAuthStore = defineStore('auth', () => {
 
   async function login(payload: LoginRequest) {
     const response = await authApi.login(payload)
+
+    tokenStorage.setAuth(response)
+    applyAuth(response.accessToken, response.refreshToken)
+
+    return response
+  }
+
+  async function telegramLogin(payload: TelegramLoginRequest) {
+    const response = await authApi.telegramLogin(payload)
 
     tokenStorage.setAuth(response)
     applyAuth(response.accessToken, response.refreshToken)
@@ -60,9 +69,9 @@ export const useAuthStore = defineStore('auth', () => {
 
     accessToken.value = newAccessToken
     refreshToken.value = newRefreshToken
-    role.value = normalizeRole(newClaims?.role)
-    userId.value = newClaims?.userId ?? null
-    yattId.value = newClaims?.yattId ?? null
+    role.value = normalizeRole(newClaims?.role) ?? (tokenStorage.getRole() as YaTTUserRole | null)
+    userId.value = newClaims?.userId ?? tokenStorage.getUserId()
+    yattId.value = newClaims?.yattId ?? tokenStorage.getYattId()
     yattRes.value = tokenStorage.getLoginYatts()
   }
 
@@ -102,6 +111,7 @@ export const useAuthStore = defineStore('auth', () => {
     yattRes,
     isAuthenticated,
     login,
+    telegramLogin,
     selectYatt,
     refreshAccessToken,
     logout,
