@@ -65,8 +65,9 @@ export const tokenStorage = {
   getRole: () => localStorage.getItem(ROLE_KEY),
   getUserId: () => Number(localStorage.getItem(USER_ID_KEY)) || null,
   getYattId: () => Number(localStorage.getItem(YATT_ID_KEY)) || null,
-  getLoginYatts: () => safeJsonParse(localStorage.getItem(LOGIN_YATTS_KEY) ?? '[]') as LoginYattRes[],
-  setAuth: (response: LoginResponse) => {
+  getLoginYatts: () =>
+    safeJsonParse(localStorage.getItem(LOGIN_YATTS_KEY) ?? '[]') as LoginYattRes[],
+  setAuth: (response: LoginResponse, options: { preserveLoginYatts?: boolean } = {}) => {
     const claims = decodeJwtPayload(response.accessToken)
     const role = normalizeRole(response.role ?? claims?.role)
     const yattId = claims?.yattId ?? response.activeYattId
@@ -74,7 +75,9 @@ export const tokenStorage = {
     localStorage.removeItem(ROLE_KEY)
     localStorage.removeItem(USER_ID_KEY)
     localStorage.removeItem(YATT_ID_KEY)
-    localStorage.removeItem(LOGIN_YATTS_KEY)
+    if (!options.preserveLoginYatts) {
+      localStorage.removeItem(LOGIN_YATTS_KEY)
+    }
 
     localStorage.setItem(ACCESS_TOKEN_KEY, response.accessToken)
     localStorage.setItem(REFRESH_TOKEN_KEY, response.refreshToken)
@@ -155,7 +158,11 @@ export function isJwtExpired(token: string | null) {
   return claims.exp * 1000 <= Date.now()
 }
 
-async function request<T>(path: string, options: RequestOptions = {}, didRetry = false): Promise<T> {
+async function request<T>(
+  path: string,
+  options: RequestOptions = {},
+  didRetry = false,
+): Promise<T> {
   const headers = new Headers()
 
   if (options.body) {
@@ -179,11 +186,7 @@ async function request<T>(path: string, options: RequestOptions = {}, didRetry =
       body: options.body ? JSON.stringify(options.body) : undefined,
     })
   } catch (error) {
-    throw new ApiError(
-      `Backendga ulanib bolmadi: ${API_BASE_URL}${path}`,
-      0,
-      error,
-    )
+    throw new ApiError(`Backendga ulanib bolmadi: ${API_BASE_URL}${path}`, 0, error)
   }
 
   const text = await response.text()
@@ -235,7 +238,7 @@ async function refreshStoredAccessToken() {
       auth: false,
     })
 
-    tokenStorage.setAuth(response)
+    tokenStorage.setAuth(response, { preserveLoginYatts: true })
     return response
   } catch {
     tokenStorage.clear()

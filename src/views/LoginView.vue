@@ -172,7 +172,7 @@ function getErrorMessage(error: unknown, fallback: string) {
         <span class="brand-mark">K</span>
         <div>
           <p>Kassa App</p>
-          <h1>Admin kirish</h1>
+          <h1>Tizimga kirish</h1>
         </div>
       </div>
 
@@ -201,7 +201,11 @@ function getErrorMessage(error: unknown, fallback: string) {
 
         <p v-if="errorMessage" class="alert">{{ errorMessage }}</p>
 
-        <button class="primary-button" type="submit" :disabled="!canSubmit || isSubmitting || isTelegramLogin">
+        <button
+          class="primary-button"
+          type="submit"
+          :disabled="!canSubmit || isSubmitting || isTelegramLogin"
+        >
           {{ isSubmitting || isTelegramLogin ? 'Kirilmoqda...' : 'Kirish' }}
         </button>
       </form>
@@ -210,7 +214,11 @@ function getErrorMessage(error: unknown, fallback: string) {
         <label class="field">
           <span>YATT</span>
           <select v-model.number="selectedYattId" :disabled="isSelectingYatt">
-            <option v-for="yatt in yattList" :key="getLoginYattKey(yatt)" :value="getLoginYattId(yatt)">
+            <option
+              v-for="yatt in yattList"
+              :key="getLoginYattKey(yatt)"
+              :value="getLoginYattId(yatt)"
+            >
               {{ yatt.name }} - {{ yatt.role }}
             </option>
           </select>

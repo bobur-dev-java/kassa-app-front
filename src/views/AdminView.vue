@@ -33,10 +33,7 @@ const userForm = reactive({
 const canCreateYatt = computed(() => yattForm.name.trim().length > 1)
 const canCreateUser = computed(
   () =>
-    selectedYattId.value &&
-    userForm.username.trim() &&
-    userForm.password.trim() &&
-    userForm.role,
+    selectedYattId.value && userForm.username.trim() && userForm.password.trim() && userForm.role,
 )
 
 onMounted(loadDashboard)
@@ -127,14 +124,26 @@ function getErrorMessage(error: unknown, fallback: string) {
         <p>Admin panel</p>
         <h1>Kassa boshqaruv</h1>
         <span class="session-meta">
-          {{ auth.role ?? 'ROLE' }} · User #{{ auth.userId ?? '-' }} · YATT #{{ auth.yattId ?? '-' }}
+          {{ auth.role ?? 'ROLE' }} · User #{{ auth.userId ?? '-' }} · YATT #{{
+            auth.yattId ?? '-'
+          }}
         </span>
       </div>
       <div class="topbar-actions">
         <YattSwitcher @switched="loadDashboard" />
         <TelegramConnectButton
-          @success="(message) => { actionMessage = message; actionError = '' }"
-          @error="(message) => { actionError = message; actionMessage = '' }"
+          @success="
+            (message) => {
+              actionMessage = message
+              actionError = ''
+            }
+          "
+          @error="
+            (message) => {
+              actionError = message
+              actionMessage = ''
+            }
+          "
         />
         <button class="ghost-button" type="button" @click="logout">Chiqish</button>
       </div>
@@ -163,7 +172,11 @@ function getErrorMessage(error: unknown, fallback: string) {
       <form class="form compact" @submit.prevent="createYatt">
         <label class="field">
           <span>Nomi</span>
-          <input v-model="yattForm.name" placeholder="Masalan: Bobur Market" :disabled="isLoading" />
+          <input
+            v-model="yattForm.name"
+            placeholder="Masalan: Bobur Market"
+            :disabled="isLoading"
+          />
         </label>
         <button class="primary-button" type="submit" :disabled="!canCreateYatt || isLoading">
           Yaratish

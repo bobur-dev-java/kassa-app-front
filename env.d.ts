@@ -20,6 +20,9 @@ interface Window {
       openTelegramLink?: (link: string) => void
       ready?: () => void
       expand?: () => void
+      setBackgroundColor?: (color: string) => void
+      setHeaderColor?: (color: string) => void
+      setBottomBarColor?: (color: string) => void
     }
   }
 }

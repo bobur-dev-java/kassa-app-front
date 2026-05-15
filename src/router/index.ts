@@ -45,10 +45,32 @@ const router = createRouter({
 router.beforeEach(async (to) => {
   const auth = useAuthStore()
   const roles = to.meta.roles as string[] | undefined
-  const hasExpiredAccessToken = auth.isAuthenticated && isJwtExpired(auth.accessToken)
-  const hasTelegramLoginPayload = to.meta.guestOnly && hasTelegramInitData()
+  const telegramInitData = getTelegramInitData()
+  let hasExpiredAccessToken = auth.isAuthenticated && isJwtExpired(auth.accessToken)
+  const hasTelegramLoginPayload = to.meta.guestOnly && Boolean(telegramInitData)
 
-  if ((to.meta.requiresAuth || to.meta.guestOnly) && (!auth.isAuthenticated || hasExpiredAccessToken)) {
+  if (
+    to.meta.requiresAuth &&
+    telegramInitData &&
+    !auth.isTelegramInitDataApplied(telegramInitData)
+  ) {
+    auth.logout()
+
+    const telegramLoginResponse = await auth
+      .telegramLogin({ initData: telegramInitData })
+      .catch(() => null)
+
+    if (!telegramLoginResponse) {
+      return { name: 'login' }
+    }
+
+    hasExpiredAccessToken = auth.isAuthenticated && isJwtExpired(auth.accessToken)
+  }
+
+  if (
+    (to.meta.requiresAuth || to.meta.guestOnly) &&
+    (!auth.isAuthenticated || hasExpiredAccessToken)
+  ) {
     const refreshed = await auth.refreshAccessToken().catch(() => null)
 
     if (to.meta.requiresAuth && !refreshed) {
@@ -72,15 +94,12 @@ router.beforeEach(async (to) => {
   return true
 })
 
-function hasTelegramInitData() {
-  if (window.Telegram?.WebApp?.initData) {
-    return true
-  }
-
+function getTelegramInitData() {
+  const webAppInitData = window.Telegram?.WebApp?.initData
   const hashParams = new URLSearchParams(window.location.hash.replace(/^#/, ''))
   const searchParams = new URLSearchParams(window.location.search)
 
-  return Boolean(hashParams.get('tgWebAppData') || searchParams.get('tgWebAppData'))
+  return webAppInitData ?? hashParams.get('tgWebAppData') ?? searchParams.get('tgWebAppData') ?? ''
 }
 
 export function getHomeRouteName(role: string | null) {

@@ -100,18 +100,33 @@ function normalizeTelegramLink(link: string) {
   align-items: center;
   gap: 8px;
   flex-wrap: wrap;
+  min-width: 0;
 }
 
 .telegram-link {
-  min-height: 40px;
+  min-height: 42px;
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   border-radius: 8px;
-  background: var(--tg-theme-button-color, #127c64);
-  color: var(--tg-theme-button-text-color, #ffffff);
+  background: var(--primary);
+  color: var(--primary-text);
   font-size: 14px;
   font-weight: 800;
   padding: 0 14px;
   text-decoration: none;
+}
+
+@media (max-width: 760px) {
+  .telegram-connect {
+    display: grid;
+    grid-template-columns: 1fr;
+    width: 100%;
+  }
+
+  .telegram-connect .ghost-button,
+  .telegram-link {
+    width: 100%;
+  }
 }
 </style>

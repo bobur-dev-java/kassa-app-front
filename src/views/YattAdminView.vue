@@ -131,7 +131,8 @@ async function loadDashboard() {
     users.value = usersResponse
     kassaForm.ownerId = kassaForm.ownerId ?? usersResponse[0]?.id ?? null
     productForm.fromUserId = productForm.fromUserId ?? usersResponse[0]?.id ?? null
-    productForm.toUserId = productForm.toUserId ?? usersResponse[1]?.id ?? usersResponse[0]?.id ?? null
+    productForm.toUserId =
+      productForm.toUserId ?? usersResponse[1]?.id ?? usersResponse[0]?.id ?? null
     moneyForm.fromUserId = moneyForm.fromUserId ?? usersResponse[0]?.id ?? null
     moneyForm.toUserId = moneyForm.toUserId ?? usersResponse[1]?.id ?? usersResponse[0]?.id ?? null
     await Promise.all([loadKassa(), loadProducts(), loadMoney(), loadDebits()])
@@ -446,7 +447,8 @@ function editMoneyTransaction() {
 }
 
 async function updateMoneyTransaction() {
-  if (!selectedMoneyTransaction.value || !moneyEditForm.fromUserId || !moneyEditForm.toUserId) return
+  if (!selectedMoneyTransaction.value || !moneyEditForm.fromUserId || !moneyEditForm.toUserId)
+    return
 
   await runAction(async () => {
     await yattAdminApi.updateMoneyTransaction(selectedMoneyTransaction.value!.id, {
@@ -555,8 +557,18 @@ function money(value: number) {
       <div class="topbar-actions">
         <YattSwitcher @switched="loadDashboard" />
         <TelegramConnectButton
-          @success="(message) => { actionMessage = message; actionError = '' }"
-          @error="(message) => { actionError = message; actionMessage = '' }"
+          @success="
+            (message) => {
+              actionMessage = message
+              actionError = ''
+            }
+          "
+          @error="
+            (message) => {
+              actionError = message
+              actionMessage = ''
+            }
+          "
         />
         <button class="ghost-button" type="button" @click="logout">Chiqish</button>
       </div>
@@ -629,7 +641,9 @@ function money(value: number) {
       <form class="form compact" @submit.prevent="addStaff">
         <label class="field"><span>To‘liq ism</span><input v-model="staffForm.fullName" /></label>
         <label class="field"><span>Username</span><input v-model="staffForm.username" /></label>
-        <label class="field"><span>Parol</span><input v-model="staffForm.password" type="password" /></label>
+        <label class="field"
+          ><span>Parol</span><input v-model="staffForm.password" type="password"
+        /></label>
         <label class="field">
           <span>Role</span>
           <select v-model="staffForm.role">
@@ -650,15 +664,25 @@ function money(value: number) {
         <label class="field">
           <span>Owner</span>
           <select v-model.number="kassaForm.ownerId">
-            <option v-for="user in users" :key="user.id" :value="user.id">{{ user.fullName }}</option>
+            <option v-for="user in users" :key="user.id" :value="user.id">
+              {{ user.fullName }}
+            </option>
           </select>
         </label>
         <div class="mini-grid">
-          <label class="field"><span>Terminal</span><input v-model.number="kassaForm.terminal" type="number" /></label>
-          <label class="field"><span>Card</span><input v-model.number="kassaForm.card" type="number" /></label>
-          <label class="field"><span>Cash</span><input v-model.number="kassaForm.cash" type="number" /></label>
+          <label class="field"
+            ><span>Terminal</span><input v-model.number="kassaForm.terminal" type="number"
+          /></label>
+          <label class="field"
+            ><span>Card</span><input v-model.number="kassaForm.card" type="number"
+          /></label>
+          <label class="field"
+            ><span>Cash</span><input v-model.number="kassaForm.cash" type="number"
+          /></label>
         </div>
-        <label class="field"><span>Sana</span><input v-model="kassaForm.kassaDate" type="date" /></label>
+        <label class="field"
+          ><span>Sana</span><input v-model="kassaForm.kassaDate" type="date"
+        /></label>
         <label class="field"><span>Comment</span><input v-model="kassaForm.comment" /></label>
         <button class="primary-button" type="submit" :disabled="isLoading">Kassa yaratish</button>
       </form>
@@ -672,7 +696,9 @@ function money(value: number) {
       <div class="section-actions">
         <button class="ghost-button" type="button" @click="kassaMode = 'list'">Ortga</button>
         <button class="ghost-button" type="button" @click="editKassa">Edit</button>
-        <button class="danger-button" type="button" :disabled="isLoading" @click="deleteKassa">Delete</button>
+        <button class="danger-button" type="button" :disabled="isLoading" @click="deleteKassa">
+          Delete
+        </button>
       </div>
       <article class="list-card">
         <strong>{{ selectedKassa.ownerName }} · {{ money(selectedKassa.totaAmount) }}</strong>
@@ -694,15 +720,25 @@ function money(value: number) {
         <label class="field">
           <span>Owner</span>
           <select v-model.number="kassaEditForm.ownerId">
-            <option v-for="user in users" :key="user.id" :value="user.id">{{ user.fullName }}</option>
+            <option v-for="user in users" :key="user.id" :value="user.id">
+              {{ user.fullName }}
+            </option>
           </select>
         </label>
         <div class="mini-grid">
-          <label class="field"><span>Terminal</span><input v-model.number="kassaEditForm.terminal" type="number" /></label>
-          <label class="field"><span>Card</span><input v-model.number="kassaEditForm.card" type="number" /></label>
-          <label class="field"><span>Cash</span><input v-model.number="kassaEditForm.cash" type="number" /></label>
+          <label class="field"
+            ><span>Terminal</span><input v-model.number="kassaEditForm.terminal" type="number"
+          /></label>
+          <label class="field"
+            ><span>Card</span><input v-model.number="kassaEditForm.card" type="number"
+          /></label>
+          <label class="field"
+            ><span>Cash</span><input v-model.number="kassaEditForm.cash" type="number"
+          /></label>
         </div>
-        <label class="field"><span>Sana</span><input v-model="kassaEditForm.kassaDate" type="date" /></label>
+        <label class="field"
+          ><span>Sana</span><input v-model="kassaEditForm.kassaDate" type="date"
+        /></label>
         <label class="field"><span>Comment</span><input v-model="kassaEditForm.comment" /></label>
         <button class="primary-button" type="submit" :disabled="isLoading">Saqlash</button>
       </form>
@@ -716,18 +752,40 @@ function money(value: number) {
       <button class="ghost-button" type="button" @click="productMode = 'list'">Ortga</button>
       <form class="form compact" @submit.prevent="createProductTransaction">
         <div class="mini-grid">
-          <label class="field"><span>From</span><select v-model.number="productForm.fromUserId"><option v-for="user in users" :key="user.id" :value="user.id">{{ user.fullName }}</option></select></label>
-          <label class="field"><span>To</span><select v-model.number="productForm.toUserId"><option v-for="user in users" :key="user.id" :value="user.id">{{ user.fullName }}</option></select></label>
+          <label class="field"
+            ><span>From</span
+            ><select v-model.number="productForm.fromUserId">
+              <option v-for="user in users" :key="user.id" :value="user.id">
+                {{ user.fullName }}
+              </option>
+            </select></label
+          >
+          <label class="field"
+            ><span>To</span
+            ><select v-model.number="productForm.toUserId">
+              <option v-for="user in users" :key="user.id" :value="user.id">
+                {{ user.fullName }}
+              </option>
+            </select></label
+          >
         </div>
-        <label class="field"><span>Sana</span><input v-model="productForm.transactionDate" type="date" /></label>
+        <label class="field"
+          ><span>Sana</span><input v-model="productForm.transactionDate" type="date"
+        /></label>
         <div v-for="(product, index) in productForm.products" :key="index" class="product-row">
           <label class="field"><span>Nomi</span><input v-model="product.name" /></label>
-          <label class="field"><span>Narx</span><input v-model.number="product.price" type="number" /></label>
-          <label class="field"><span>Soni</span><input v-model.number="product.quantity" type="number" /></label>
+          <label class="field"
+            ><span>Narx</span><input v-model.number="product.price" type="number"
+          /></label>
+          <label class="field"
+            ><span>Soni</span><input v-model.number="product.quantity" type="number"
+          /></label>
           <button class="ghost-button" type="button" @click="removeProductRow(index)">-</button>
         </div>
         <button class="ghost-button" type="button" @click="addProductRow">Product qo‘shish</button>
-        <button class="primary-button" type="submit" :disabled="isLoading">Transaction yaratish</button>
+        <button class="primary-button" type="submit" :disabled="isLoading">
+          Transaction yaratish
+        </button>
       </form>
     </section>
 
@@ -742,7 +800,12 @@ function money(value: number) {
       <div class="section-actions">
         <button class="ghost-button" type="button" @click="productMode = 'list'">Ortga</button>
         <button class="ghost-button" type="button" @click="editProductTransaction">Edit</button>
-        <button class="danger-button" type="button" :disabled="isLoading" @click="deleteProductTransaction">
+        <button
+          class="danger-button"
+          type="button"
+          :disabled="isLoading"
+          @click="deleteProductTransaction"
+        >
           Delete
         </button>
       </div>
@@ -751,9 +814,16 @@ function money(value: number) {
           {{ selectedProductTransaction.fromUserFullName }} →
           {{ selectedProductTransaction.toUserFullName }}
         </strong>
-        <span>{{ selectedProductTransaction.transactionDate }} · {{ money(selectedProductTransaction.totalPrice) }}</span>
+        <span
+          >{{ selectedProductTransaction.transactionDate }} ·
+          {{ money(selectedProductTransaction.totalPrice) }}</span
+        >
       </article>
-      <article v-for="product in selectedProductTransaction.products" :key="product.id" class="list-card">
+      <article
+        v-for="product in selectedProductTransaction.products"
+        :key="product.id"
+        class="list-card"
+      >
         <strong>{{ product.name }}</strong>
         <span>Narx: {{ money(product.price) }} · Soni: {{ product.quantity }}</span>
       </article>
@@ -770,17 +840,39 @@ function money(value: number) {
       <button class="ghost-button" type="button" @click="productMode = 'detail'">Ortga</button>
       <form class="form compact" @submit.prevent="updateProductTransaction">
         <div class="mini-grid">
-          <label class="field"><span>From</span><select v-model.number="productEditForm.fromUserId"><option v-for="user in users" :key="user.id" :value="user.id">{{ user.fullName }}</option></select></label>
-          <label class="field"><span>To</span><select v-model.number="productEditForm.toUserId"><option v-for="user in users" :key="user.id" :value="user.id">{{ user.fullName }}</option></select></label>
+          <label class="field"
+            ><span>From</span
+            ><select v-model.number="productEditForm.fromUserId">
+              <option v-for="user in users" :key="user.id" :value="user.id">
+                {{ user.fullName }}
+              </option>
+            </select></label
+          >
+          <label class="field"
+            ><span>To</span
+            ><select v-model.number="productEditForm.toUserId">
+              <option v-for="user in users" :key="user.id" :value="user.id">
+                {{ user.fullName }}
+              </option>
+            </select></label
+          >
         </div>
-        <label class="field"><span>Sana</span><input v-model="productEditForm.transactionDate" type="date" /></label>
+        <label class="field"
+          ><span>Sana</span><input v-model="productEditForm.transactionDate" type="date"
+        /></label>
         <div v-for="(product, index) in productEditForm.products" :key="index" class="product-row">
           <label class="field"><span>Nomi</span><input v-model="product.name" /></label>
-          <label class="field"><span>Narx</span><input v-model.number="product.price" type="number" /></label>
-          <label class="field"><span>Soni</span><input v-model.number="product.quantity" type="number" /></label>
+          <label class="field"
+            ><span>Narx</span><input v-model.number="product.price" type="number"
+          /></label>
+          <label class="field"
+            ><span>Soni</span><input v-model.number="product.quantity" type="number"
+          /></label>
           <button class="ghost-button" type="button" @click="removeProductEditRow(index)">-</button>
         </div>
-        <button class="ghost-button" type="button" @click="addProductEditRow">Product qo‘shish</button>
+        <button class="ghost-button" type="button" @click="addProductEditRow">
+          Product qo‘shish
+        </button>
         <button class="primary-button" type="submit" :disabled="isLoading">Saqlash</button>
       </form>
     </section>
@@ -793,13 +885,38 @@ function money(value: number) {
       <button class="ghost-button" type="button" @click="moneyMode = 'list'">Ortga</button>
       <form class="form compact" @submit.prevent="createMoneyTransaction">
         <div class="mini-grid">
-          <label class="field"><span>From</span><select v-model.number="moneyForm.fromUserId"><option v-for="user in users" :key="user.id" :value="user.id">{{ user.fullName }}</option></select></label>
-          <label class="field"><span>To</span><select v-model.number="moneyForm.toUserId"><option v-for="user in users" :key="user.id" :value="user.id">{{ user.fullName }}</option></select></label>
+          <label class="field"
+            ><span>From</span
+            ><select v-model.number="moneyForm.fromUserId">
+              <option v-for="user in users" :key="user.id" :value="user.id">
+                {{ user.fullName }}
+              </option>
+            </select></label
+          >
+          <label class="field"
+            ><span>To</span
+            ><select v-model.number="moneyForm.toUserId">
+              <option v-for="user in users" :key="user.id" :value="user.id">
+                {{ user.fullName }}
+              </option>
+            </select></label
+          >
         </div>
-        <label class="field"><span>Sana</span><input v-model="moneyForm.transactionDate" type="date" /></label>
-        <label class="field"><span>Summa</span><input v-model.number="moneyForm.amount" type="number" /></label>
-        <label class="field"><span>Type</span><select v-model="moneyForm.moneyType"><option v-for="type in moneyTypes" :key="type" :value="type">{{ type }}</option></select></label>
-        <button class="primary-button" type="submit" :disabled="isLoading">Transaction yaratish</button>
+        <label class="field"
+          ><span>Sana</span><input v-model="moneyForm.transactionDate" type="date"
+        /></label>
+        <label class="field"
+          ><span>Summa</span><input v-model.number="moneyForm.amount" type="number"
+        /></label>
+        <label class="field"
+          ><span>Type</span
+          ><select v-model="moneyForm.moneyType">
+            <option v-for="type in moneyTypes" :key="type" :value="type">{{ type }}</option>
+          </select></label
+        >
+        <button class="primary-button" type="submit" :disabled="isLoading">
+          Transaction yaratish
+        </button>
       </form>
     </section>
 
@@ -814,7 +931,12 @@ function money(value: number) {
       <div class="section-actions">
         <button class="ghost-button" type="button" @click="moneyMode = 'list'">Ortga</button>
         <button class="ghost-button" type="button" @click="editMoneyTransaction">Edit</button>
-        <button class="danger-button" type="button" :disabled="isLoading" @click="deleteMoneyTransaction">
+        <button
+          class="danger-button"
+          type="button"
+          :disabled="isLoading"
+          @click="deleteMoneyTransaction"
+        >
           Delete
         </button>
       </div>
@@ -823,7 +945,10 @@ function money(value: number) {
           {{ selectedMoneyTransaction.fromUserFullName }} →
           {{ selectedMoneyTransaction.toUserFullName }}
         </strong>
-        <span>{{ selectedMoneyTransaction.transactionDate }} · {{ selectedMoneyTransaction.moneyType }}</span>
+        <span
+          >{{ selectedMoneyTransaction.transactionDate }} ·
+          {{ selectedMoneyTransaction.moneyType }}</span
+        >
         <span>Summa: {{ money(selectedMoneyTransaction.amount) }}</span>
       </article>
     </section>
@@ -839,12 +964,35 @@ function money(value: number) {
       <button class="ghost-button" type="button" @click="moneyMode = 'detail'">Ortga</button>
       <form class="form compact" @submit.prevent="updateMoneyTransaction">
         <div class="mini-grid">
-          <label class="field"><span>From</span><select v-model.number="moneyEditForm.fromUserId"><option v-for="user in users" :key="user.id" :value="user.id">{{ user.fullName }}</option></select></label>
-          <label class="field"><span>To</span><select v-model.number="moneyEditForm.toUserId"><option v-for="user in users" :key="user.id" :value="user.id">{{ user.fullName }}</option></select></label>
+          <label class="field"
+            ><span>From</span
+            ><select v-model.number="moneyEditForm.fromUserId">
+              <option v-for="user in users" :key="user.id" :value="user.id">
+                {{ user.fullName }}
+              </option>
+            </select></label
+          >
+          <label class="field"
+            ><span>To</span
+            ><select v-model.number="moneyEditForm.toUserId">
+              <option v-for="user in users" :key="user.id" :value="user.id">
+                {{ user.fullName }}
+              </option>
+            </select></label
+          >
         </div>
-        <label class="field"><span>Sana</span><input v-model="moneyEditForm.transactionDate" type="date" /></label>
-        <label class="field"><span>Summa</span><input v-model.number="moneyEditForm.amount" type="number" /></label>
-        <label class="field"><span>Type</span><select v-model="moneyEditForm.moneyType"><option v-for="type in moneyTypes" :key="type" :value="type">{{ type }}</option></select></label>
+        <label class="field"
+          ><span>Sana</span><input v-model="moneyEditForm.transactionDate" type="date"
+        /></label>
+        <label class="field"
+          ><span>Summa</span><input v-model.number="moneyEditForm.amount" type="number"
+        /></label>
+        <label class="field"
+          ><span>Type</span
+          ><select v-model="moneyEditForm.moneyType">
+            <option v-for="type in moneyTypes" :key="type" :value="type">{{ type }}</option>
+          </select></label
+        >
         <button class="primary-button" type="submit" :disabled="isLoading">Saqlash</button>
       </form>
     </section>
@@ -893,21 +1041,30 @@ function money(value: number) {
           <span>Owner</span>
           <select v-model.number="commonFilter.ownerId">
             <option :value="null">Hammasi</option>
-            <option v-for="user in users" :key="user.id" :value="user.id">{{ user.fullName }}</option>
+            <option v-for="user in users" :key="user.id" :value="user.id">
+              {{ user.fullName }}
+            </option>
           </select>
         </label>
-        <label v-if="activeTab === 'products' || activeTab === 'money' || activeTab === 'debits'" class="field">
+        <label
+          v-if="activeTab === 'products' || activeTab === 'money' || activeTab === 'debits'"
+          class="field"
+        >
           <span>From user</span>
           <select v-model.number="commonFilter.fromUserId">
             <option :value="null">Hammasi</option>
-            <option v-for="user in users" :key="user.id" :value="user.id">{{ user.fullName }}</option>
+            <option v-for="user in users" :key="user.id" :value="user.id">
+              {{ user.fullName }}
+            </option>
           </select>
         </label>
         <label v-if="activeTab === 'products' || activeTab === 'money'" class="field">
           <span>To user</span>
           <select v-model.number="commonFilter.toUserId">
             <option :value="null">Hammasi</option>
-            <option v-for="user in users" :key="user.id" :value="user.id">{{ user.fullName }}</option>
+            <option v-for="user in users" :key="user.id" :value="user.id">
+              {{ user.fullName }}
+            </option>
           </select>
         </label>
         <label v-if="activeTab === 'money'" class="field">
@@ -917,7 +1074,10 @@ function money(value: number) {
             <option v-for="type in moneyTypes" :key="type" :value="type">{{ type }}</option>
           </select>
         </label>
-        <label v-if="activeTab === 'kassa' || activeTab === 'products' || activeTab === 'money'" class="field">
+        <label
+          v-if="activeTab === 'kassa' || activeTab === 'products' || activeTab === 'money'"
+          class="field"
+        >
           <span>Status</span>
           <select v-model="commonFilter.isCompleted">
             <option :value="null">Hammasi</option>
@@ -925,7 +1085,9 @@ function money(value: number) {
             <option :value="false">Open</option>
           </select>
         </label>
-        <label class="field"><span>From</span><input v-model="commonFilter.from" type="date" /></label>
+        <label class="field"
+          ><span>From</span><input v-model="commonFilter.from" type="date"
+        /></label>
         <label class="field"><span>To</span><input v-model="commonFilter.to" type="date" /></label>
       </div>
       <button class="ghost-button" type="button" @click="refreshActiveList">Filter</button>
@@ -963,9 +1125,16 @@ function money(value: number) {
         <strong>{{ item.fromUserFullName }} → {{ item.toUserFullName }}</strong>
         <span>{{ item.transactionDate }} · {{ item.moneyType }} · {{ money(item.amount) }}</span>
       </button>
-      <article v-for="item in debits" v-if="activeTab === 'debits'" :key="item.fromUserId" class="list-card">
+      <article
+        v-for="item in debits"
+        v-if="activeTab === 'debits'"
+        :key="item.fromUserId"
+        class="list-card"
+      >
         <strong>User #{{ item.fromUserId }}</strong>
-        <span>Active: {{ money(item.activeAmount) }} · Non active: {{ money(item.nonActive) }}</span>
+        <span
+          >Active: {{ money(item.activeAmount) }} · Non active: {{ money(item.nonActive) }}</span
+        >
       </article>
     </section>
   </main>
