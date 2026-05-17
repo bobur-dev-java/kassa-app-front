@@ -1,0 +1,12 @@
+services:
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: kassa-app-front
+    environment:
+      VITE_API_BASE_URL: ${VITE_API_BASE_URL}
+      VITE_APP_TITLE: ${VITE_APP_TITLE:-Kassa System}
+    ports:
+      - "3001:3001"
+    restart: unless-stopped
