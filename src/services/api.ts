@@ -28,8 +28,9 @@ import type {
   YattCreateRequest,
   YattResponse,
 } from '@/types/api'
+import { APP_CONFIG } from '@/config/app-config'
 
-const API_BASE_URL = (import.meta.env.VITE_API_BASE_URL ?? '').replace(/\/$/, '')
+const API_BASE_URL = APP_CONFIG.apiBaseUrl
 const ACCESS_TOKEN_KEY = 'kassa_access_token'
 const REFRESH_TOKEN_KEY = 'kassa_refresh_token'
 const ROLE_KEY = 'kassa_user_role'

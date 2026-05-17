@@ -1,0 +1,9 @@
+.agents
+.codex
+.git
+.github
+.vscode
+dist
+node_modules
+.env
+npm-debug.log*

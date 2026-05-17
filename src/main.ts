@@ -2,6 +2,7 @@ import { createApp } from 'vue'
 import { createPinia } from 'pinia'
 
 import App from './App.vue'
+import { APP_CONFIG } from './config/app-config'
 import router from './router'
 
 const APP_BACKGROUND_COLOR = '#f4f7f6'
@@ -18,6 +19,8 @@ function configureTelegramWebApp() {
 }
 
 configureTelegramWebApp()
+
+document.title = APP_CONFIG.appTitle
 
 const app = createApp(App)
 
