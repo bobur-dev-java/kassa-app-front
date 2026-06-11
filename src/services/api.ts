@@ -371,6 +371,11 @@ export const yattAdminApi = {
     apiResponse<boolean>(`/api/yatt-admin/product-transaction/${id}`, { method: 'PUT', body }),
   deleteProductTransaction: (id: number) =>
     apiResponse<boolean>(`/api/yatt-admin/product-transaction/${id}`, { method: 'DELETE' }),
+  deleteProduct: (productTransactionId: number, productId: number) =>
+    apiResponse<boolean>(
+      withQuery('/api/yatt-admin/product', { productTransactionId, productId }),
+      { method: 'DELETE' },
+    ),
   downloadProductTransactionsExcel: (filter: ProductTransactionFilter = {}) =>
     downloadFile(
       withQuery('/api/yatt-admin/product-transactions/excel', filter),

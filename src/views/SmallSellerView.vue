@@ -455,7 +455,14 @@ function money(value: number) {
             }
           "
         />
-        <button class="ghost-button" type="button" @click="logout">Chiqish</button>
+        <button class="ghost-button" type="button" @click="logout">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="16" height="16">
+            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+            <polyline points="16 17 21 12 16 7"></polyline>
+            <line x1="21" y1="12" x2="9" y2="12"></line>
+          </svg>
+          Chiqish
+        </button>
       </div>
     </header>
 
@@ -468,142 +475,210 @@ function money(value: number) {
         type="button"
         @click="selectTab(tab.key)"
       >
+        <svg v-if="tab.key === 'profile'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="16" height="16" style="margin-right: 6px; vertical-align: middle;">
+          <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+          <circle cx="12" cy="7" r="4"></circle>
+        </svg>
+        <svg v-if="tab.key === 'kassa'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="16" height="16" style="margin-right: 6px; vertical-align: middle;">
+          <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>
+          <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
+        </svg>
+        <svg v-if="tab.key === 'products'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="16" height="16" style="margin-right: 6px; vertical-align: middle;">
+          <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+          <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
+          <line x1="12" y1="22.08" x2="12" y2="12"></line>
+        </svg>
+        <svg v-if="tab.key === 'money'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="16" height="16" style="margin-right: 6px; vertical-align: middle;">
+          <line x1="12" y1="1" x2="12" y2="23"></line>
+          <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+        </svg>
         {{ tab.label }}
       </button>
     </nav>
 
-    <p v-if="actionMessage" class="success">{{ actionMessage }}</p>
-    <p v-if="actionError" class="alert">{{ actionError }}</p>
+    <p v-if="actionMessage" class="success">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="20" height="20">
+        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+        <polyline points="22 4 12 14.01 9 11.01"></polyline>
+      </svg>
+      {{ actionMessage }}
+    </p>
+    <p v-if="actionError" class="alert">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="20" height="20">
+        <circle cx="12" cy="12" r="10"></circle>
+        <line x1="12" y1="8" x2="12" y2="12"></line>
+        <line x1="12" y1="16" x2="12.01" y2="16"></line>
+      </svg>
+      {{ actionError }}
+    </p>
 
     <section v-if="activeTab === 'profile'" class="panel">
       <div class="section-title">
-        <h2>Profil</h2>
+        <h2>Profil ma‘lumotlari</h2>
         <span>{{ profile?.username }}</span>
       </div>
       <form class="form compact" @submit.prevent="saveProfile">
-        <label class="field"
-          ><span>To‘liq ism</span><input v-model="profileForm.fullName" :disabled="isLoading"
-        /></label>
-        <label class="field"
-          ><span>Username</span><input v-model="profileForm.username" :disabled="isLoading"
-        /></label>
-        <button class="primary-button" type="submit" :disabled="isLoading">Saqlash</button>
+        <label class="field">
+          <span>To‘liq ism</span>
+          <input v-model="profileForm.fullName" :disabled="isLoading" />
+        </label>
+        <label class="field">
+          <span>Username</span>
+          <input v-model="profileForm.username" :disabled="isLoading" />
+        </label>
+        <button class="primary-button" type="submit" :disabled="isLoading">
+          Saqlash
+        </button>
       </form>
       <form class="form compact" @submit.prevent="savePassword">
-        <label class="field"
-          ><span>Eski parol</span
-          ><input v-model="passwordForm.oldPassword" type="password" :disabled="isLoading"
-        /></label>
-        <label class="field"
-          ><span>Yangi parol</span
-          ><input v-model="passwordForm.newPassword" type="password" :disabled="isLoading"
-        /></label>
-        <button class="ghost-button" type="submit" :disabled="isLoading">Parolni yangilash</button>
+        <label class="field">
+          <span>Eski parol</span>
+          <input v-model="passwordForm.oldPassword" type="password" :disabled="isLoading" />
+        </label>
+        <label class="field">
+          <span>Yangi parol</span>
+          <input v-model="passwordForm.newPassword" type="password" :disabled="isLoading" />
+        </label>
+        <button class="ghost-button" type="submit" :disabled="isLoading">
+          Parolni yangilash
+        </button>
       </form>
     </section>
 
     <section v-if="activeTab === 'kassa' && kassaMode === 'create'" class="panel">
       <div class="section-title">
         <h2>Kassa yaratish</h2>
-        <span>Jami: {{ money(kassaTotal) }}</span>
+        <span>Jami: {{ money(kassaTotal) }} UZS</span>
       </div>
-      <button class="ghost-button" type="button" @click="kassaMode = 'list'">Ortga</button>
+      <div class="section-actions" style="margin-bottom: 15px;">
+        <button class="ghost-button" type="button" @click="kassaMode = 'list'">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="16" height="16">
+            <line x1="19" y1="12" x2="5" y2="12"></line>
+            <polyline points="12 19 5 12 12 5"></polyline>
+          </svg>
+          Ortga
+        </button>
+      </div>
       <form class="form compact" @submit.prevent="createKassa">
         <div class="mini-grid">
-          <label class="field"
-            ><span>Terminal</span><input v-model.number="kassaForm.terminal" type="number"
-          /></label>
-          <label class="field"
-            ><span>Card</span><input v-model.number="kassaForm.card" type="number"
-          /></label>
-          <label class="field"
-            ><span>Cash</span><input v-model.number="kassaForm.cash" type="number"
-          /></label>
+          <label class="field"><span>Terminal</span><input v-model.number="kassaForm.terminal" type="number" /></label>
+          <label class="field"><span>Card</span><input v-model.number="kassaForm.card" type="number" /></label>
+          <label class="field"><span>Cash</span><input v-model.number="kassaForm.cash" type="number" /></label>
         </div>
-        <label class="field"
-          ><span>Sana</span><input v-model="kassaForm.kassaDate" type="date"
-        /></label>
-        <label class="field"><span>Comment</span><input v-model="kassaForm.comment" /></label>
-        <button class="primary-button" type="submit" :disabled="isLoading">Kassa yaratish</button>
+        <label class="field"><span>Sana</span><input v-model="kassaForm.kassaDate" type="date" /></label>
+        <label class="field"><span>Izoh (Comment)</span><input v-model="kassaForm.comment" placeholder="Izoh qoldiring..." /></label>
+        <button class="primary-button" type="submit" :disabled="isLoading">
+          Kassa yaratish
+        </button>
       </form>
     </section>
 
     <section v-if="activeTab === 'kassa' && kassaMode === 'detail' && selectedKassa" class="panel">
       <div class="section-title">
-        <h2>Kassa #{{ selectedKassa.id }}</h2>
-        <span>{{ selectedKassa.isCompleted ? 'Completed' : 'Open' }}</span>
+        <h2>Kassa tafsilotlari #{{ selectedKassa.id }}</h2>
+        <span class="badge" :class="selectedKassa.isCompleted ? 'badge-completed' : 'badge-open'">
+          {{ selectedKassa.isCompleted ? 'Completed' : 'Open' }}
+        </span>
       </div>
-      <div class="section-actions">
-        <button class="ghost-button" type="button" @click="kassaMode = 'list'">Ortga</button>
-        <button class="ghost-button" type="button" @click="editKassa">Edit</button>
+      <div class="section-actions" style="margin-bottom: 20px;">
+        <button class="ghost-button" type="button" @click="kassaMode = 'list'">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="16" height="16">
+            <line x1="19" y1="12" x2="5" y2="12"></line>
+            <polyline points="12 19 5 12 12 5"></polyline>
+          </svg>
+          Ortga
+        </button>
+        <button class="ghost-button" type="button" @click="editKassa">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="16" height="16">
+            <path d="M12 20h9"></path>
+            <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path>
+          </svg>
+          Tahrirlash
+        </button>
       </div>
-      <article class="list-card">
-        <strong>{{ selectedKassa.ownerName }} · {{ money(selectedKassa.totaAmount) }}</strong>
-        <span>{{ selectedKassa.kassaDate }}</span>
-        <span>Terminal: {{ money(selectedKassa.terminal) }}</span>
-        <span>Card: {{ money(selectedKassa.card) }}</span>
-        <span>Cash: {{ money(selectedKassa.cash) }}</span>
-        <span v-if="selectedKassa.comment">Comment: {{ selectedKassa.comment }}</span>
+      <article class="list-card" style="box-shadow: none; border-color: var(--line);">
+        <strong>{{ selectedKassa.ownerName }} · {{ money(selectedKassa.totaAmount) }} UZS</strong>
+        <span>Sana: {{ selectedKassa.kassaDate }}</span>
+        <span>Terminal: {{ money(selectedKassa.terminal) }} UZS</span>
+        <span>Card: {{ money(selectedKassa.card) }} UZS</span>
+        <span>Cash: {{ money(selectedKassa.cash) }} UZS</span>
+        <span v-if="selectedKassa.comment">Izoh: {{ selectedKassa.comment }}</span>
       </article>
     </section>
 
     <section v-if="activeTab === 'kassa' && kassaMode === 'edit' && selectedKassa" class="panel">
       <div class="section-title">
         <h2>Kassa tahrirlash</h2>
-        <span>Jami: {{ money(kassaEditTotal) }}</span>
+        <span>Jami: {{ money(kassaEditTotal) }} UZS</span>
       </div>
-      <button class="ghost-button" type="button" @click="kassaMode = 'detail'">Ortga</button>
+      <div class="section-actions" style="margin-bottom: 15px;">
+        <button class="ghost-button" type="button" @click="kassaMode = 'detail'">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="16" height="16">
+            <line x1="19" y1="12" x2="5" y2="12"></line>
+            <polyline points="12 19 5 12 12 5"></polyline>
+          </svg>
+          Ortga
+        </button>
+      </div>
       <form class="form compact" @submit.prevent="updateKassa">
         <div class="mini-grid">
-          <label class="field"
-            ><span>Terminal</span><input v-model.number="kassaEditForm.terminal" type="number"
-          /></label>
-          <label class="field"
-            ><span>Card</span><input v-model.number="kassaEditForm.card" type="number"
-          /></label>
-          <label class="field"
-            ><span>Cash</span><input v-model.number="kassaEditForm.cash" type="number"
-          /></label>
+          <label class="field"><span>Terminal</span><input v-model.number="kassaEditForm.terminal" type="number" /></label>
+          <label class="field"><span>Card</span><input v-model.number="kassaEditForm.card" type="number" /></label>
+          <label class="field"><span>Cash</span><input v-model.number="kassaEditForm.cash" type="number" /></label>
         </div>
-        <label class="field"
-          ><span>Sana</span><input v-model="kassaEditForm.kassaDate" type="date"
-        /></label>
-        <label class="field"><span>Comment</span><input v-model="kassaEditForm.comment" /></label>
-        <button class="primary-button" type="submit" :disabled="isLoading">Saqlash</button>
+        <label class="field"><span>Sana</span><input v-model="kassaEditForm.kassaDate" type="date" /></label>
+        <label class="field"><span>Izoh</span><input v-model="kassaEditForm.comment" /></label>
+        <button class="primary-button" type="submit" :disabled="isLoading">
+          Saqlash
+        </button>
       </form>
     </section>
 
     <section v-if="activeTab === 'products' && productMode === 'create'" class="panel">
       <div class="section-title">
-        <h2>Product transaction</h2>
-        <span>{{ productForm.products.length }} product</span>
+        <h2>Mahsulot tranzaksiyasi</h2>
+        <span>{{ productForm.products.length }} ta mahsulot</span>
       </div>
-      <button class="ghost-button" type="button" @click="productMode = 'list'">Ortga</button>
+      <div class="section-actions" style="margin-bottom: 15px;">
+        <button class="ghost-button" type="button" @click="productMode = 'list'">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="16" height="16">
+            <line x1="19" y1="12" x2="5" y2="12"></line>
+            <polyline points="12 19 5 12 12 5"></polyline>
+          </svg>
+          Ortga
+        </button>
+      </div>
       <form class="form compact" @submit.prevent="createProductTransaction">
-        <label class="field"
-          ><span>From</span
-          ><select v-model.number="productForm.fromUserId">
+        <label class="field">
+          <span>Yuboruvchi (From)</span>
+          <select v-model.number="productForm.fromUserId">
             <option v-for="user in users" :key="user.id" :value="user.id">
               {{ user.fullName }}
             </option>
-          </select></label
-        >
-        <label class="field"
-          ><span>Sana</span><input v-model="productForm.transactionDate" type="date"
-        /></label>
+          </select>
+        </label>
+        <label class="field"><span>Sana</span><input v-model="productForm.transactionDate" type="date" /></label>
+        
         <div v-for="(product, index) in productForm.products" :key="index" class="product-row">
-          <label class="field"><span>Nomi</span><input v-model="product.name" /></label>
-          <label class="field"
-            ><span>Narx</span><input v-model.number="product.price" type="number"
-          /></label>
-          <label class="field"
-            ><span>Soni</span><input v-model.number="product.quantity" type="number"
-          /></label>
-          <button class="ghost-button" type="button" @click="removeProductRow(index)">-</button>
+          <label class="field"><span>Nomi</span><input v-model="product.name" placeholder="Masalan: Olma" /></label>
+          <label class="field"><span>Narx (UZS)</span><input v-model.number="product.price" type="number" /></label>
+          <label class="field"><span>Soni</span><input v-model.number="product.quantity" type="number" /></label>
+          <button class="ghost-button" type="button" @click="removeProductRow(index)">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="18" height="18">
+              <line x1="5" y1="12" x2="19" y2="12"></line>
+            </svg>
+          </button>
         </div>
-        <button class="ghost-button" type="button" @click="addProductRow">Product qo‘shish</button>
+        
+        <button class="ghost-button" type="button" @click="addProductRow" style="margin-top: 10px;">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="16" height="16">
+            <line x1="12" y1="5" x2="12" y2="19"></line>
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+          </svg>
+          Mahsulot qo‘shish
+        </button>
         <button class="primary-button" type="submit" :disabled="isLoading">
-          Transaction yaratish
+          Tranzaksiya yaratish
         </button>
       </form>
     </section>
@@ -613,31 +688,45 @@ function money(value: number) {
       class="panel"
     >
       <div class="section-title">
-        <h2>Product transaction #{{ selectedProductTransaction.id }}</h2>
-        <span>{{ selectedProductTransaction.isCompleted ? 'Completed' : 'Open' }}</span>
+        <h2>Mahsulot tranzaksiyasi #{{ selectedProductTransaction.id }}</h2>
+        <span class="badge" :class="selectedProductTransaction.isCompleted ? 'badge-completed' : 'badge-open'">
+          {{ selectedProductTransaction.isCompleted ? 'Completed' : 'Open' }}
+        </span>
       </div>
-      <div class="section-actions">
-        <button class="ghost-button" type="button" @click="productMode = 'list'">Ortga</button>
-        <button class="ghost-button" type="button" @click="editProductTransaction">Edit</button>
+      <div class="section-actions" style="margin-bottom: 20px;">
+        <button class="ghost-button" type="button" @click="productMode = 'list'">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="16" height="16">
+            <line x1="19" y1="12" x2="5" y2="12"></line>
+            <polyline points="12 19 5 12 12 5"></polyline>
+          </svg>
+          Ortga
+        </button>
+        <button class="ghost-button" type="button" @click="editProductTransaction">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="16" height="16">
+            <path d="M12 20h9"></path>
+            <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path>
+          </svg>
+          Tahrirlash
+        </button>
       </div>
-      <article class="list-card">
-        <strong
-          >{{ selectedProductTransaction.fromUserFullName }} →
-          {{ selectedProductTransaction.toUserFullName }}</strong
-        >
-        <span
-          >{{ selectedProductTransaction.transactionDate }} ·
-          {{ money(selectedProductTransaction.totalPrice) }}</span
-        >
+      <article class="list-card" style="box-shadow: none; border-color: var(--line);">
+        <strong>{{ selectedProductTransaction.fromUserFullName }} → {{ selectedProductTransaction.toUserFullName }}</strong>
+        <span>Sana: {{ selectedProductTransaction.transactionDate }}</span>
+        <span>Jami summa: {{ money(selectedProductTransaction.totalPrice) }} UZS</span>
       </article>
-      <article
-        v-for="product in selectedProductTransaction.products"
-        :key="product.id"
-        class="list-card"
-      >
-        <strong>{{ product.name }}</strong>
-        <span>Narx: {{ money(product.price) }} · Soni: {{ product.quantity }}</span>
-      </article>
+
+      <div style="margin-top: 15px;">
+        <h3 style="margin-bottom: 10px; font-size: 16px;">Mahsulotlar ro'yxati</h3>
+        <article
+          v-for="product in selectedProductTransaction.products"
+          :key="product.id"
+          class="list-card"
+          style="background: #fafcfb;"
+        >
+          <strong>{{ product.name }}</strong>
+          <span>Narx: {{ money(product.price) }} UZS · Soni: {{ product.quantity }} ta</span>
+        </article>
+      </div>
     </section>
 
     <section
@@ -645,68 +734,88 @@ function money(value: number) {
       class="panel"
     >
       <div class="section-title">
-        <h2>Product tahrirlash</h2>
-        <span>{{ productEditForm.products.length }} product</span>
+        <h2>Mahsulot tranzaksiyasini tahrirlash</h2>
+        <span>{{ productEditForm.products.length }} ta mahsulot</span>
       </div>
-      <button class="ghost-button" type="button" @click="productMode = 'detail'">Ortga</button>
+      <div class="section-actions" style="margin-bottom: 15px;">
+        <button class="ghost-button" type="button" @click="productMode = 'detail'">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="16" height="16">
+            <line x1="19" y1="12" x2="5" y2="12"></line>
+            <polyline points="12 19 5 12 12 5"></polyline>
+          </svg>
+          Ortga
+        </button>
+      </div>
       <form class="form compact" @submit.prevent="updateProductTransaction">
-        <label class="field"
-          ><span>From</span
-          ><select v-model.number="productEditForm.fromUserId">
+        <label class="field">
+          <span>Yuboruvchi (From)</span>
+          <select v-model.number="productEditForm.fromUserId">
             <option v-for="user in users" :key="user.id" :value="user.id">
               {{ user.fullName }}
             </option>
-          </select></label
-        >
-        <label class="field"
-          ><span>Sana</span><input v-model="productEditForm.transactionDate" type="date"
-        /></label>
+          </select>
+        </label>
+        <label class="field"><span>Sana</span><input v-model="productEditForm.transactionDate" type="date" /></label>
+        
         <div v-for="(product, index) in productEditForm.products" :key="index" class="product-row">
           <label class="field"><span>Nomi</span><input v-model="product.name" /></label>
-          <label class="field"
-            ><span>Narx</span><input v-model.number="product.price" type="number"
-          /></label>
-          <label class="field"
-            ><span>Soni</span><input v-model.number="product.quantity" type="number"
-          /></label>
-          <button class="ghost-button" type="button" @click="removeProductEditRow(index)">-</button>
+          <label class="field"><span>Narx</span><input v-model.number="product.price" type="number" /></label>
+          <label class="field"><span>Soni</span><input v-model.number="product.quantity" type="number" /></label>
+          <button class="ghost-button" type="button" @click="removeProductEditRow(index)">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="18" height="18">
+              <line x1="5" y1="12" x2="19" y2="12"></line>
+            </svg>
+          </button>
         </div>
-        <button class="ghost-button" type="button" @click="addProductEditRow">
-          Product qo‘shish
+        
+        <button class="ghost-button" type="button" @click="addProductEditRow" style="margin-top: 10px;">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="16" height="16">
+            <line x1="12" y1="5" x2="12" y2="19"></line>
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+          </svg>
+          Mahsulot qo‘shish
         </button>
-        <button class="primary-button" type="submit" :disabled="isLoading">Saqlash</button>
+        <button class="primary-button" type="submit" :disabled="isLoading">
+          Saqlash
+        </button>
       </form>
     </section>
 
     <section v-if="activeTab === 'money' && moneyMode === 'create'" class="panel">
       <div class="section-title">
-        <h2>Money transaction</h2>
-        <span>{{ moneyForm.moneyType }}</span>
+        <h2>Pul o'tkazmasi (Money transaction)</h2>
+        <span>
+          <span class="badge" :class="'badge-' + moneyForm.moneyType.toLowerCase()">{{ moneyForm.moneyType }}</span>
+        </span>
       </div>
-      <button class="ghost-button" type="button" @click="moneyMode = 'list'">Ortga</button>
+      <div class="section-actions" style="margin-bottom: 15px;">
+        <button class="ghost-button" type="button" @click="moneyMode = 'list'">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="16" height="16">
+            <line x1="19" y1="12" x2="5" y2="12"></line>
+            <polyline points="12 19 5 12 12 5"></polyline>
+          </svg>
+          Ortga
+        </button>
+      </div>
       <form class="form compact" @submit.prevent="createMoneyTransaction">
-        <label class="field"
-          ><span>To</span
-          ><select v-model.number="moneyForm.toUserId">
+        <label class="field">
+          <span>Qabul qiluvchi (To)</span>
+          <select v-model.number="moneyForm.toUserId">
             <option v-for="user in users" :key="user.id" :value="user.id">
               {{ user.fullName }}
             </option>
-          </select></label
-        >
-        <label class="field"
-          ><span>Sana</span><input v-model="moneyForm.transactionDate" type="date"
-        /></label>
-        <label class="field"
-          ><span>Summa</span><input v-model.number="moneyForm.amount" type="number"
-        /></label>
-        <label class="field"
-          ><span>Type</span
-          ><select v-model="moneyForm.moneyType">
+          </select>
+        </label>
+        <label class="field"><span>Sana</span><input v-model="moneyForm.transactionDate" type="date" /></label>
+        <label class="field"><span>Summa (UZS)</span><input v-model.number="moneyForm.amount" type="number" /></label>
+        <label class="field">
+          <span>Turi (Type)</span>
+          <select v-model="moneyForm.moneyType">
             <option v-for="type in moneyTypes" :key="type" :value="type">{{ type }}</option>
-          </select></label
-        >
+          </select>
+        </label>
         <button class="primary-button" type="submit" :disabled="isLoading">
-          Transaction yaratish
+          Tranzaksiya yaratish
         </button>
       </form>
     </section>
@@ -716,23 +825,35 @@ function money(value: number) {
       class="panel"
     >
       <div class="section-title">
-        <h2>Money transaction #{{ selectedMoneyTransaction.id }}</h2>
-        <span>{{ selectedMoneyTransaction.isCompleted ? 'Completed' : 'Open' }}</span>
+        <h2>Pul o'tkazmasi tafsilotlari #{{ selectedMoneyTransaction.id }}</h2>
+        <span class="badge" :class="selectedMoneyTransaction.isCompleted ? 'badge-completed' : 'badge-open'">
+          {{ selectedMoneyTransaction.isCompleted ? 'Completed' : 'Open' }}
+        </span>
       </div>
-      <div class="section-actions">
-        <button class="ghost-button" type="button" @click="moneyMode = 'list'">Ortga</button>
-        <button class="ghost-button" type="button" @click="editMoneyTransaction">Edit</button>
+      <div class="section-actions" style="margin-bottom: 20px;">
+        <button class="ghost-button" type="button" @click="moneyMode = 'list'">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="16" height="16">
+            <line x1="19" y1="12" x2="5" y2="12"></line>
+            <polyline points="12 19 5 12 12 5"></polyline>
+          </svg>
+          Ortga
+        </button>
+        <button class="ghost-button" type="button" @click="editMoneyTransaction">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="16" height="16">
+            <path d="M12 20h9"></path>
+            <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path>
+          </svg>
+          Tahrirlash
+        </button>
       </div>
-      <article class="list-card">
-        <strong
-          >{{ selectedMoneyTransaction.fromUserFullName }} →
-          {{ selectedMoneyTransaction.toUserFullName }}</strong
-        >
-        <span
-          >{{ selectedMoneyTransaction.transactionDate }} ·
-          {{ selectedMoneyTransaction.moneyType }}</span
-        >
-        <span>Summa: {{ money(selectedMoneyTransaction.amount) }}</span>
+      <article class="list-card" style="box-shadow: none; border-color: var(--line);">
+        <strong>{{ selectedMoneyTransaction.fromUserFullName }} → {{ selectedMoneyTransaction.toUserFullName }}</strong>
+        <span>Sana: {{ selectedMoneyTransaction.transactionDate }}</span>
+        <span>
+          Turi: 
+          <span class="badge" :class="'badge-' + selectedMoneyTransaction.moneyType.toLowerCase()">{{ selectedMoneyTransaction.moneyType }}</span>
+        </span>
+        <span>Summa: {{ money(selectedMoneyTransaction.amount) }} UZS</span>
       </article>
     </section>
 
@@ -741,31 +862,37 @@ function money(value: number) {
       class="panel"
     >
       <div class="section-title">
-        <h2>Money tahrirlash</h2>
-        <span>{{ moneyEditForm.moneyType }}</span>
+        <h2>Pul o'tkazmasini tahrirlash</h2>
+        <span>
+          <span class="badge" :class="'badge-' + moneyEditForm.moneyType.toLowerCase()">{{ moneyEditForm.moneyType }}</span>
+        </span>
       </div>
-      <button class="ghost-button" type="button" @click="moneyMode = 'detail'">Ortga</button>
+      <div class="section-actions" style="margin-bottom: 15px;">
+        <button class="ghost-button" type="button" @click="moneyMode = 'detail'">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="16" height="16">
+            <line x1="19" y1="12" x2="5" y2="12"></line>
+            <polyline points="12 19 5 12 12 5"></polyline>
+          </svg>
+          Ortga
+        </button>
+      </div>
       <form class="form compact" @submit.prevent="updateMoneyTransaction">
-        <label class="field"
-          ><span>To</span
-          ><select v-model.number="moneyEditForm.toUserId">
+        <label class="field">
+          <span>Qabul qiluvchi (To)</span>
+          <select v-model.number="moneyEditForm.toUserId">
             <option v-for="user in users" :key="user.id" :value="user.id">
               {{ user.fullName }}
             </option>
-          </select></label
-        >
-        <label class="field"
-          ><span>Sana</span><input v-model="moneyEditForm.transactionDate" type="date"
-        /></label>
-        <label class="field"
-          ><span>Summa</span><input v-model.number="moneyEditForm.amount" type="number"
-        /></label>
-        <label class="field"
-          ><span>Type</span
-          ><select v-model="moneyEditForm.moneyType">
+          </select>
+        </label>
+        <label class="field"><span>Sana</span><input v-model="moneyEditForm.transactionDate" type="date" /></label>
+        <label class="field"><span>Summa (UZS)</span><input v-model.number="moneyEditForm.amount" type="number" /></label>
+        <label class="field">
+          <span>Turi</span>
+          <select v-model="moneyEditForm.moneyType">
             <option v-for="type in moneyTypes" :key="type" :value="type">{{ type }}</option>
-          </select></label
-        >
+          </select>
+        </label>
         <button class="primary-button" type="submit" :disabled="isLoading">Saqlash</button>
       </form>
     </section>
@@ -779,7 +906,9 @@ function money(value: number) {
       class="panel"
     >
       <div class="section-title">
-        <h2>{{ activeTab === 'kassa' ? 'Kassa ro‘yxati' : 'Ro‘yxat' }}</h2>
+        <h2>
+          {{ activeTab === 'kassa' ? 'Kassa ro‘yxati' : (activeTab === 'products' ? 'Mahsulotlar tranzaksiyalari' : 'Pul tranzaksiyalari') }}
+        </h2>
         <div class="section-actions">
           <button
             v-if="activeTab === 'kassa'"
@@ -787,7 +916,11 @@ function money(value: number) {
             type="button"
             @click="kassaMode = 'create'"
           >
-            + Kassa
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="14" height="14">
+              <line x1="12" y1="5" x2="12" y2="19"></line>
+              <line x1="5" y1="12" x2="19" y2="12"></line>
+            </svg>
+            Kassa
           </button>
           <button
             v-if="activeTab === 'products'"
@@ -795,7 +928,11 @@ function money(value: number) {
             type="button"
             @click="productMode = 'create'"
           >
-            + Product transaction
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="14" height="14">
+              <line x1="12" y1="5" x2="12" y2="19"></line>
+              <line x1="5" y1="12" x2="19" y2="12"></line>
+            </svg>
+            Mahsulot qo‘shish
           </button>
           <button
             v-if="activeTab === 'money'"
@@ -803,14 +940,28 @@ function money(value: number) {
             type="button"
             @click="moneyMode = 'create'"
           >
-            + Money transaction
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="14" height="14">
+              <line x1="12" y1="5" x2="12" y2="19"></line>
+              <line x1="5" y1="12" x2="19" y2="12"></line>
+            </svg>
+            Pul o'tkazish
           </button>
-          <button class="ghost-button" type="button" @click="downloadActiveExcel">Excel</button>
+          <button class="ghost-button" type="button" @click="downloadActiveExcel">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="14" height="14" style="color: #107c41;">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+              <polyline points="14 2 14 8 20 8"></polyline>
+              <line x1="16" y1="13" x2="8" y2="13"></line>
+              <line x1="16" y1="17" x2="8" y2="17"></line>
+              <polyline points="10 9 9 9 8 9"></polyline>
+            </svg>
+            Excel
+          </button>
         </div>
       </div>
+
       <div class="mini-grid">
         <label v-if="activeTab === 'products'" class="field">
-          <span>From user</span>
+          <span>Yuboruvchi user bo'yicha</span>
           <select v-model.number="commonFilter.fromUserId">
             <option :value="null">Hammasi</option>
             <option v-for="user in users" :key="user.id" :value="user.id">
@@ -819,7 +970,7 @@ function money(value: number) {
           </select>
         </label>
         <label v-if="activeTab === 'money'" class="field">
-          <span>To user</span>
+          <span>Qabul qiluvchi user bo'yicha</span>
           <select v-model.number="commonFilter.toUserId">
             <option :value="null">Hammasi</option>
             <option v-for="user in users" :key="user.id" :value="user.id">
@@ -828,60 +979,103 @@ function money(value: number) {
           </select>
         </label>
         <label v-if="activeTab === 'money'" class="field">
-          <span>Money type</span>
+          <span>To'lov turi bo'yicha</span>
           <select v-model="commonFilter.moneyType">
             <option value="">Hammasi</option>
             <option v-for="type in moneyTypes" :key="type" :value="type">{{ type }}</option>
           </select>
         </label>
         <label class="field">
-          <span>Status</span>
+          <span>Holati (Status)</span>
           <select v-model="commonFilter.isCompleted">
             <option :value="null">Hammasi</option>
             <option :value="true">Completed</option>
             <option :value="false">Open</option>
           </select>
         </label>
-        <label class="field"
-          ><span>From</span><input v-model="commonFilter.from" type="date"
-        /></label>
-        <label class="field"><span>To</span><input v-model="commonFilter.to" type="date" /></label>
+        <label class="field"><span>Dan (From)</span><input v-model="commonFilter.from" type="date" /></label>
+        <label class="field"><span>Gacha (To)</span><input v-model="commonFilter.to" type="date" /></label>
       </div>
-      <button class="ghost-button" type="button" @click="refreshActiveList">Filter</button>
 
-      <button
-        v-for="item in kassaList"
-        v-if="activeTab === 'kassa'"
-        :key="item.id"
-        class="list-card"
-        type="button"
-        @click="openKassaDetail(item.id)"
-      >
-        <strong>{{ item.ownerName }} · {{ money(item.totaAmount) }}</strong>
-        <span>{{ item.kassaDate }} · {{ item.isCompleted ? 'Completed' : 'Open' }}</span>
+      <button class="ghost-button" type="button" @click="refreshActiveList" style="width: 100%; margin-bottom: 20px; font-weight: 700; border-color: var(--primary); color: var(--primary);">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="16" height="16" style="vertical-align: middle; margin-right: 4px;">
+          <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon>
+        </svg>
+        Filtrlarni qo‘llash
       </button>
-      <button
-        v-for="item in productTransactions"
-        v-if="activeTab === 'products'"
-        :key="item.id"
-        class="list-card"
-        type="button"
-        @click="openProductTransactionDetail(item.id)"
-      >
-        <strong>{{ item.fromUserFullName }} → {{ item.toUserFullName }}</strong>
-        <span>{{ item.transactionDate }} · {{ money(item.totalPrice) }}</span>
-      </button>
-      <button
-        v-for="item in moneyTransactions"
-        v-if="activeTab === 'money'"
-        :key="item.id"
-        class="list-card"
-        type="button"
-        @click="openMoneyTransactionDetail(item.id)"
-      >
-        <strong>{{ item.fromUserFullName }} → {{ item.toUserFullName }}</strong>
-        <span>{{ item.transactionDate }} · {{ item.moneyType }} · {{ money(item.amount) }}</span>
-      </button>
+
+      <div style="display: flex; flex-direction: column; gap: 4px;">
+        <button
+          v-for="item in kassaList"
+          v-if="activeTab === 'kassa'"
+          :key="item.id"
+          class="list-card"
+          type="button"
+          @click="openKassaDetail(item.id)"
+        >
+          <strong>{{ item.ownerName }} · {{ money(item.totaAmount) }} UZS</strong>
+          <span>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="14" height="14">
+              <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+              <line x1="16" y1="2" x2="16" y2="6"></line>
+              <line x1="8" y1="2" x2="8" y2="6"></line>
+              <line x1="3" y1="10" x2="21" y2="10"></line>
+            </svg>
+            {{ item.kassaDate }} · 
+            <span class="badge" :class="item.isCompleted ? 'badge-completed' : 'badge-open'">
+              {{ item.isCompleted ? 'Completed' : 'Open' }}
+            </span>
+          </span>
+        </button>
+
+        <button
+          v-for="item in productTransactions"
+          v-if="activeTab === 'products'"
+          :key="item.id"
+          class="list-card"
+          type="button"
+          @click="openProductTransactionDetail(item.id)"
+        >
+          <strong>{{ item.fromUserFullName }} → {{ item.toUserFullName }}</strong>
+          <span>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="14" height="14">
+              <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+              <line x1="16" y1="2" x2="16" y2="6"></line>
+              <line x1="8" y1="2" x2="8" y2="6"></line>
+              <line x1="3" y1="10" x2="21" y2="10"></line>
+            </svg>
+            {{ item.transactionDate }} · 
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="14" height="14" style="color: var(--primary);">
+              <circle cx="12" cy="12" r="10"></circle>
+              <line x1="12" y1="8" x2="12" y2="16"></line>
+              <line x1="8" y1="12" x2="16" y2="12"></line>
+            </svg>
+            {{ money(item.totalPrice) }} UZS
+          </span>
+        </button>
+
+        <button
+          v-for="item in moneyTransactions"
+          v-if="activeTab === 'money'"
+          :key="item.id"
+          class="list-card"
+          type="button"
+          @click="openMoneyTransactionDetail(item.id)"
+        >
+          <strong>{{ item.fromUserFullName }} → {{ item.toUserFullName }}</strong>
+          <span>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="14" height="14">
+              <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+              <line x1="16" y1="2" x2="16" y2="6"></line>
+              <line x1="8" y1="2" x2="8" y2="6"></line>
+              <line x1="3" y1="10" x2="21" y2="10"></line>
+            </svg>
+            {{ item.transactionDate }} · 
+            <span class="badge" :class="'badge-' + item.moneyType.toLowerCase()">{{ item.moneyType }}</span> · 
+            {{ money(item.amount) }} UZS
+          </span>
+        </button>
+      </div>
     </section>
   </main>
 </template>

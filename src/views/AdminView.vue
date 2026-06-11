@@ -145,23 +145,57 @@ function getErrorMessage(error: unknown, fallback: string) {
             }
           "
         />
-        <button class="ghost-button" type="button" @click="logout">Chiqish</button>
+        <button class="ghost-button" type="button" @click="logout">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="16" height="16">
+            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+            <polyline points="16 17 21 12 16 7"></polyline>
+            <line x1="21" y1="12" x2="9" y2="12"></line>
+          </svg>
+          Chiqish
+        </button>
       </div>
     </header>
 
     <section class="stats-grid">
       <article class="stat-card">
-        <span>Foydalanuvchilar</span>
+        <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+          <span>Foydalanuvchilar</span>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="22" height="22" style="color: var(--primary); opacity: 0.85;">
+            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+            <circle cx="9" cy="7" r="4"></circle>
+            <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+            <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+          </svg>
+        </div>
         <strong>{{ systemInfo?.userCount ?? '...' }}</strong>
       </article>
       <article class="stat-card">
-        <span>YATTlar</span>
+        <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+          <span>YATTlar</span>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="22" height="22" style="color: var(--primary); opacity: 0.85;">
+            <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>
+            <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
+          </svg>
+        </div>
         <strong>{{ systemInfo?.yattCount ?? '...' }}</strong>
       </article>
     </section>
 
-    <p v-if="actionMessage" class="success">{{ actionMessage }}</p>
-    <p v-if="actionError" class="alert">{{ actionError }}</p>
+    <p v-if="actionMessage" class="success">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="20" height="20">
+        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+        <polyline points="22 4 12 14.01 9 11.01"></polyline>
+      </svg>
+      {{ actionMessage }}
+    </p>
+    <p v-if="actionError" class="alert">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="20" height="20">
+        <circle cx="12" cy="12" r="10"></circle>
+        <line x1="12" y1="8" x2="12" y2="12"></line>
+        <line x1="12" y1="16" x2="12.01" y2="16"></line>
+      </svg>
+      {{ actionError }}
+    </p>
 
     <section class="panel">
       <div class="section-title">
@@ -179,6 +213,10 @@ function getErrorMessage(error: unknown, fallback: string) {
           />
         </label>
         <button class="primary-button" type="submit" :disabled="!canCreateYatt || isLoading">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="16" height="16">
+            <line x1="12" y1="5" x2="12" y2="19"></line>
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+          </svg>
           Yaratish
         </button>
       </form>
@@ -228,6 +266,10 @@ function getErrorMessage(error: unknown, fallback: string) {
         </label>
 
         <button class="primary-button" type="submit" :disabled="!canCreateUser || isLoading">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="16" height="16">
+            <line x1="12" y1="5" x2="12" y2="19"></line>
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+          </svg>
           User qo‘shish
         </button>
       </form>

@@ -77,6 +77,10 @@ function normalizeTelegramLink(link: string) {
 <template>
   <div class="telegram-connect">
     <button class="ghost-button" type="button" :disabled="isConnecting" @click="connectTelegram">
+      <svg class="tg-btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="16" height="16">
+        <path d="M22 2 11 13"></path>
+        <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+      </svg>
       {{ isConnecting ? 'Ulanmoqda...' : 'Telegram ulash' }}
     </button>
 
@@ -89,6 +93,11 @@ function normalizeTelegramLink(link: string) {
       rel="noopener noreferrer"
       @click.prevent="openTelegramLink(botLink)"
     >
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="16" height="16">
+        <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+        <polyline points="15 3 21 3 21 9"></polyline>
+        <line x1="10" y1="14" x2="21" y2="3"></line>
+      </svg>
       Botga o‘tish
     </a>
   </div>
@@ -103,18 +112,35 @@ function normalizeTelegramLink(link: string) {
   min-width: 0;
 }
 
+.tg-btn-icon {
+  color: #24A1DE;
+}
+
 .telegram-link {
   min-height: 42px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  border-radius: 8px;
-  background: var(--primary);
-  color: var(--primary-text);
+  gap: 6px;
+  border-radius: var(--radius-md);
+  background: linear-gradient(135deg, #24A1DE, #1c88bd);
+  color: #ffffff;
   font-size: 14px;
-  font-weight: 800;
-  padding: 0 14px;
+  font-weight: 700;
+  padding: 0 16px;
   text-decoration: none;
+  box-shadow: 0 4px 10px rgba(36, 161, 222, 0.2);
+  transition: var(--transition);
+}
+
+.telegram-link:hover {
+  background: linear-gradient(135deg, #2cb3f2, #24A1DE);
+  box-shadow: 0 6px 14px rgba(36, 161, 222, 0.3);
+  transform: translateY(-1px);
+}
+
+.telegram-link:active {
+  transform: translateY(0) scale(0.98);
 }
 
 @media (max-width: 760px) {

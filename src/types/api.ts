@@ -197,6 +197,7 @@ export type MoneyTransactionFilter = {
 
 export type DebitResponse = {
   fromUserId: number
+  fromUserFullName?: string
   nonActive: number
   activeAmount: number
 }
