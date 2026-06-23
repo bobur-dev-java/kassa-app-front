@@ -15,13 +15,16 @@ import type {
   UserProfileResponse,
   UserResponse,
   YaTTUserRole,
+  TransactionAuditLogResponse,
+  TransactionStatus,
 } from '@/types/api'
 
-type TabKey = 'profile' | 'staff' | 'kassa' | 'products' | 'money' | 'debits'
+type TabKey = 'profile' | 'staff' | 'bigSellers' | 'kassa' | 'products' | 'money' | 'debits'
 
 const tabs: { key: TabKey; label: string }[] = [
   { key: 'profile', label: 'Profil' },
   { key: 'staff', label: 'Staff' },
+  { key: 'bigSellers', label: 'Big Sellers' },
   { key: 'kassa', label: 'Kassa' },
   { key: 'products', label: 'Product' },
   { key: 'money', label: 'Money' },
@@ -43,6 +46,11 @@ const actionError = ref('')
 
 const profile = ref<UserProfileResponse | null>(null)
 const users = ref<UserResponse[]>([])
+const staffList = ref<UserResponse[]>([])
+const bigSellersList = ref<UserResponse[]>([])
+const staffSearch = ref('')
+const bigSellersSearch = ref('')
+const transactionAuditLogs = ref<TransactionAuditLogResponse[]>([])
 const kassaList = ref<KassaResponse[]>([])
 const productTransactions = ref<ProductTransactionResponse[]>([])
 const moneyTransactions = ref<MoneyTransactionResponse[]>([])
@@ -108,6 +116,7 @@ const commonFilter = reactive({
   from: '',
   to: '',
   isCompleted: null as boolean | null,
+  status: null as TransactionStatus | null,
   moneyType: '' as MoneyType | '',
 })
 
@@ -135,7 +144,7 @@ async function loadDashboard() {
       productForm.toUserId ?? usersResponse[1]?.id ?? usersResponse[0]?.id ?? null
     moneyForm.fromUserId = moneyForm.fromUserId ?? usersResponse[0]?.id ?? null
     moneyForm.toUserId = moneyForm.toUserId ?? usersResponse[1]?.id ?? usersResponse[0]?.id ?? null
-    await Promise.all([loadKassa(), loadProducts(), loadMoney(), loadDebits()])
+    await Promise.all([loadKassa(), loadProducts(), loadMoney(), loadDebits(), loadStaff(), loadBigSellers()])
   }, false)
 }
 
@@ -160,7 +169,7 @@ async function loadProducts() {
       toUserId: commonFilter.toUserId,
       from: commonFilter.from,
       to: commonFilter.to,
-      isCompleted: commonFilter.isCompleted,
+      status: commonFilter.status,
     },
     0,
     10,
@@ -176,7 +185,7 @@ async function loadMoney() {
       moneyType: commonFilter.moneyType,
       from: commonFilter.from,
       to: commonFilter.to,
-      isCompleted: commonFilter.isCompleted,
+      status: commonFilter.status,
     },
     0,
     10,
@@ -187,6 +196,16 @@ async function loadMoney() {
 async function loadDebits() {
   const response = await yattAdminApi.getDebits({ fromUserId: commonFilter.fromUserId }, 0, 10)
   debits.value = response.content
+}
+
+async function loadStaff() {
+  const response = await yattAdminApi.getStaff(0, 100, staffSearch.value)
+  staffList.value = response.content
+}
+
+async function loadBigSellers() {
+  const response = await yattAdminApi.getBigSellers(0, 100, bigSellersSearch.value)
+  bigSellersList.value = response.content
 }
 
 async function saveProfile() {
@@ -209,11 +228,12 @@ async function savePassword() {
 async function addStaff() {
   await runAction(async () => {
     const id = await yattAdminApi.addStaff(staffForm)
-    actionMessage.value = `Staff qoshildi: #${id}`
+    actionMessage.value = `Staff qo'shildi: #${id}`
     staffForm.fullName = ''
     staffForm.username = ''
     staffForm.password = ''
     users.value = await yattAdminApi.getUsers()
+    await Promise.all([loadStaff(), loadBigSellers()])
     staffMode.value = 'list'
   })
 }
@@ -249,6 +269,12 @@ function selectTab(tab: TabKey) {
 
   if (tab === 'staff') {
     staffMode.value = 'list'
+    loadStaff()
+  }
+
+  if (tab === 'bigSellers') {
+    staffMode.value = 'list'
+    loadBigSellers()
   }
 
   if (tab === 'products') {
@@ -325,6 +351,8 @@ async function openKassaDetail(id: number) {
 async function openProductTransactionDetail(id: number) {
   await runAction(async () => {
     selectedProductTransaction.value = await yattAdminApi.getProductTransactionById(id)
+    const logs = await yattAdminApi.getProductAuditLogs(id)
+    transactionAuditLogs.value = logs
     productMode.value = 'detail'
   }, false)
 }
@@ -332,8 +360,58 @@ async function openProductTransactionDetail(id: number) {
 async function openMoneyTransactionDetail(id: number) {
   await runAction(async () => {
     selectedMoneyTransaction.value = await yattAdminApi.getMoneyTransactionById(id)
+    const logs = await yattAdminApi.getMoneyAuditLogs(id)
+    transactionAuditLogs.value = logs
     moneyMode.value = 'detail'
   }, false)
+}
+
+async function confirmProductTransaction(id: number) {
+  if (!window.confirm('Tranzaksiyani tasdiqlaysizmi?')) return
+  await runAction(async () => {
+    await yattAdminApi.confirmProductTransaction(id)
+    actionMessage.value = 'Tranzaksiya tasdiqlandi'
+    selectedProductTransaction.value = await yattAdminApi.getProductTransactionById(id)
+    const logs = await yattAdminApi.getProductAuditLogs(id)
+    transactionAuditLogs.value = logs
+    await loadProducts()
+  })
+}
+
+async function cancelProductTransaction(id: number) {
+  if (!window.confirm('Tranzaksiyani bekor qilasizmi?')) return
+  await runAction(async () => {
+    await yattAdminApi.cancelProductTransaction(id)
+    actionMessage.value = 'Tranzaksiya bekor qilindi'
+    selectedProductTransaction.value = await yattAdminApi.getProductTransactionById(id)
+    const logs = await yattAdminApi.getProductAuditLogs(id)
+    transactionAuditLogs.value = logs
+    await loadProducts()
+  })
+}
+
+async function confirmMoneyTransaction(id: number) {
+  if (!window.confirm('Tranzaksiyani tasdiqlaysizmi?')) return
+  await runAction(async () => {
+    await yattAdminApi.confirmMoneyTransaction(id)
+    actionMessage.value = 'Tranzaksiya tasdiqlandi'
+    selectedMoneyTransaction.value = await yattAdminApi.getMoneyTransactionById(id)
+    const logs = await yattAdminApi.getMoneyAuditLogs(id)
+    transactionAuditLogs.value = logs
+    await loadMoney()
+  })
+}
+
+async function cancelMoneyTransaction(id: number) {
+  if (!window.confirm('Tranzaksiyani bekor qilasizmi?')) return
+  await runAction(async () => {
+    await yattAdminApi.cancelMoneyTransaction(id)
+    actionMessage.value = 'Tranzaksiya bekor qilindi'
+    selectedMoneyTransaction.value = await yattAdminApi.getMoneyTransactionById(id)
+    const logs = await yattAdminApi.getMoneyAuditLogs(id)
+    transactionAuditLogs.value = logs
+    await loadMoney()
+  })
 }
 
 function editKassa() {
@@ -609,7 +687,7 @@ function money(value: number) {
           <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
           <circle cx="12" cy="7" r="4"></circle>
         </svg>
-        <svg v-if="tab.key === 'staff'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="16" height="16" style="margin-right: 6px; vertical-align: middle;">
+        <svg v-if="tab.key === 'staff' || tab.key === 'bigSellers'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="16" height="16" style="margin-right: 6px; vertical-align: middle;">
           <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
           <circle cx="9" cy="7" r="4"></circle>
           <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
@@ -687,7 +765,7 @@ function money(value: number) {
     <section v-if="activeTab === 'staff' && staffMode === 'list'" class="panel">
       <div class="section-title">
         <h2>Xodimlar ro‘yxati (Staff)</h2>
-        <button class="primary-small-button" type="button" @click="staffMode = 'create'">
+        <button class="primary-small-button" type="button" @click="staffMode = 'create'; staffForm.role = 'SMALL_SELLER'">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="14" height="14">
             <line x1="12" y1="5" x2="12" y2="19"></line>
             <line x1="5" y1="12" x2="19" y2="12"></line>
@@ -695,8 +773,35 @@ function money(value: number) {
           Xodim qo‘shish
         </button>
       </div>
+      <div class="field" style="margin-bottom: 15px; display: flex; gap: 8px; flex-direction: row; align-items: center;">
+        <input v-model="staffSearch" placeholder="Xodimlarni qidirish..." @keyup.enter="loadStaff" style="flex: 1; min-height: 42px;" />
+        <button class="ghost-button" type="button" @click="loadStaff" style="min-height: 42px;">Qidirish</button>
+      </div>
       <div style="display: flex; flex-direction: column; gap: 6px;">
-        <article v-for="user in users" :key="user.id" class="list-card">
+        <article v-for="user in staffList" :key="user.id" class="list-card">
+          <strong>{{ user.fullName }}</strong>
+          <span>ID: #{{ user.id }} · Username: @{{ user.username }}</span>
+        </article>
+      </div>
+    </section>
+
+    <section v-if="activeTab === 'bigSellers' && staffMode === 'list'" class="panel">
+      <div class="section-title">
+        <h2>Big Sellers ro‘yxati</h2>
+        <button class="primary-small-button" type="button" @click="staffMode = 'create'; staffForm.role = 'BIG_SELLER'">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="14" height="14">
+            <line x1="12" y1="5" x2="12" y2="19"></line>
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+          </svg>
+          Sotuvchi qo‘shish
+        </button>
+      </div>
+      <div class="field" style="margin-bottom: 15px; display: flex; gap: 8px; flex-direction: row; align-items: center;">
+        <input v-model="bigSellersSearch" placeholder="Sotuvchilarni qidirish..." @keyup.enter="loadBigSellers" style="flex: 1; min-height: 42px;" />
+        <button class="ghost-button" type="button" @click="loadBigSellers" style="min-height: 42px;">Qidirish</button>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 6px;">
+        <article v-for="user in bigSellersList" :key="user.id" class="list-card">
           <strong>{{ user.fullName }}</strong>
           <span>ID: #{{ user.id }} · Username: @{{ user.username }}</span>
         </article>
@@ -904,8 +1009,8 @@ function money(value: number) {
     >
       <div class="section-title">
         <h2>Tranzaksiya tafsilotlari #{{ selectedProductTransaction.id }}</h2>
-        <span class="badge" :class="selectedProductTransaction.isCompleted ? 'badge-completed' : 'badge-open'">
-          {{ selectedProductTransaction.isCompleted ? 'Completed' : 'Open' }}
+        <span class="badge" :class="'badge-' + selectedProductTransaction.status.toLowerCase()">
+          {{ selectedProductTransaction.status }}
         </span>
       </div>
       <div class="section-actions" style="margin-bottom: 20px;">
@@ -915,6 +1020,25 @@ function money(value: number) {
             <polyline points="12 19 5 12 12 5"></polyline>
           </svg>
           Ortga
+        </button>
+        <button
+          v-if="selectedProductTransaction.status === 'PENDING'"
+          class="primary-small-button"
+          type="button"
+          :disabled="isLoading"
+          @click="confirmProductTransaction(selectedProductTransaction.id)"
+        >
+          Tasdiqlash
+        </button>
+        <button
+          v-if="selectedProductTransaction.status === 'PENDING'"
+          class="danger-button"
+          type="button"
+          :disabled="isLoading"
+          @click="cancelProductTransaction(selectedProductTransaction.id)"
+          style="min-height: 42px; font-size: 14px;"
+        >
+          Bekor qilish
         </button>
         <button class="ghost-button" type="button" @click="editProductTransaction">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="16" height="16">
@@ -966,6 +1090,31 @@ function money(value: number) {
               <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
             </svg>
           </button>
+        </article>
+      </div>
+
+      <div style="margin-top: 25px; border-top: 1px solid var(--line); padding-top: 20px;">
+        <h3 style="margin-bottom: 12px; font-size: 16px;">Tranzaksiya tarixi (Audit logs)</h3>
+        <div v-if="transactionAuditLogs.length === 0" style="color: var(--hint); font-size: 14px;">Tarix mavjud emas</div>
+        <article
+          v-for="log in transactionAuditLogs"
+          :key="log.id"
+          class="list-card"
+          style="background: #fafcfb; box-shadow: none; border: 1.5px solid var(--surface-border); gap: 6px; padding: 12px;"
+        >
+          <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+            <span class="badge" :class="'badge-' + (log.actionType === 'CREATE' ? 'open' : log.actionType === 'COMPLETE' ? 'completed' : 'cancelled')">
+              {{ log.actionType }}
+            </span>
+            <span style="font-size: 12px; color: var(--hint);">{{ log.performedAt.replace('T', ' ').substring(0, 19) }}</span>
+          </div>
+          <span style="font-size: 13px;">Bajaruvchi ID: #{{ log.performedByUserId }}</span>
+          <div style="font-size: 12px; background: rgba(0,0,0,0.02); padding: 8px; border-radius: 6px; border: 1px solid rgba(0,0,0,0.04); margin-top: 6px;">
+            <strong>Avvalgi holat:</strong>
+            <pre style="margin: 4px 0 8px; font-family: monospace; white-space: pre-wrap; font-size: 11px;">{{ log.beforeState || 'null' }}</pre>
+            <strong>Keyingi holat:</strong>
+            <pre style="margin: 4px 0 0; font-family: monospace; white-space: pre-wrap; font-size: 11px;">{{ log.afterState || 'null' }}</pre>
+          </div>
         </article>
       </div>
     </section>
@@ -1083,8 +1232,8 @@ function money(value: number) {
     >
       <div class="section-title">
         <h2>Pul o'tkazmasi tafsilotlari #{{ selectedMoneyTransaction.id }}</h2>
-        <span class="badge" :class="selectedMoneyTransaction.isCompleted ? 'badge-completed' : 'badge-open'">
-          {{ selectedMoneyTransaction.isCompleted ? 'Completed' : 'Open' }}
+        <span class="badge" :class="'badge-' + selectedMoneyTransaction.status.toLowerCase()">
+          {{ selectedMoneyTransaction.status }}
         </span>
       </div>
       <div class="section-actions" style="margin-bottom: 20px;">
@@ -1094,6 +1243,25 @@ function money(value: number) {
             <polyline points="12 19 5 12 12 5"></polyline>
           </svg>
           Ortga
+        </button>
+        <button
+          v-if="selectedMoneyTransaction.status === 'PENDING'"
+          class="primary-small-button"
+          type="button"
+          :disabled="isLoading"
+          @click="confirmMoneyTransaction(selectedMoneyTransaction.id)"
+        >
+          Tasdiqlash
+        </button>
+        <button
+          v-if="selectedMoneyTransaction.status === 'PENDING'"
+          class="danger-button"
+          type="button"
+          :disabled="isLoading"
+          @click="cancelMoneyTransaction(selectedMoneyTransaction.id)"
+          style="min-height: 42px; font-size: 14px;"
+        >
+          Bekor qilish
         </button>
         <button class="ghost-button" type="button" @click="editMoneyTransaction">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="16" height="16">
@@ -1124,6 +1292,31 @@ function money(value: number) {
         </span>
         <span>Summa: {{ money(selectedMoneyTransaction.amount) }} UZS</span>
       </article>
+
+      <div style="margin-top: 25px; border-top: 1px solid var(--line); padding-top: 20px;">
+        <h3 style="margin-bottom: 12px; font-size: 16px;">Tranzaksiya tarixi (Audit logs)</h3>
+        <div v-if="transactionAuditLogs.length === 0" style="color: var(--hint); font-size: 14px;">Tarix mavjud emas</div>
+        <article
+          v-for="log in transactionAuditLogs"
+          :key="log.id"
+          class="list-card"
+          style="background: #fafcfb; box-shadow: none; border: 1.5px solid var(--surface-border); gap: 6px; padding: 12px;"
+        >
+          <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+            <span class="badge" :class="'badge-' + (log.actionType === 'CREATE' ? 'open' : log.actionType === 'COMPLETE' ? 'completed' : 'cancelled')">
+              {{ log.actionType }}
+            </span>
+            <span style="font-size: 12px; color: var(--hint);">{{ log.performedAt.replace('T', ' ').substring(0, 19) }}</span>
+          </div>
+          <span style="font-size: 13px;">Bajaruvchi ID: #{{ log.performedByUserId }}</span>
+          <div style="font-size: 12px; background: rgba(0,0,0,0.02); padding: 8px; border-radius: 6px; border: 1px solid rgba(0,0,0,0.04); margin-top: 6px;">
+            <strong>Avvalgi holat:</strong>
+            <pre style="margin: 4px 0 8px; font-family: monospace; white-space: pre-wrap; font-size: 11px;">{{ log.beforeState || 'null' }}</pre>
+            <strong>Keyingi holat:</strong>
+            <pre style="margin: 4px 0 0; font-family: monospace; white-space: pre-wrap; font-size: 11px;">{{ log.afterState || 'null' }}</pre>
+          </div>
+        </article>
+      </div>
     </section>
 
     <section
@@ -1292,12 +1485,21 @@ function money(value: number) {
             <option v-for="type in moneyTypes" :key="type" :value="type">{{ type }}</option>
           </select>
         </label>
-        <label v-if="activeTab !== 'debits'" class="field">
+        <label v-if="activeTab === 'kassa'" class="field">
           <span>Status</span>
           <select v-model="commonFilter.isCompleted">
             <option :value="null">Hammasi</option>
             <option :value="true">Completed</option>
             <option :value="false">Open</option>
+          </select>
+        </label>
+        <label v-else-if="activeTab !== 'debits'" class="field">
+          <span>Status</span>
+          <select v-model="commonFilter.status">
+            <option :value="null">Hammasi</option>
+            <option value="PENDING">Pending</option>
+            <option value="COMPLETED">Completed</option>
+            <option value="CANCELLED">Cancelled</option>
           </select>
         </label>
         <label class="field"><span>Dan</span><input v-model="commonFilter.from" type="date" /></label>
@@ -1352,6 +1554,7 @@ function money(value: number) {
               <line x1="3" y1="10" x2="21" y2="10"></line>
             </svg>
             {{ item.transactionDate }} · 
+            <span class="badge" :class="'badge-' + item.status.toLowerCase()">{{ item.status }}</span> · 
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="14" height="14" style="color: var(--primary);">
               <circle cx="12" cy="12" r="10"></circle>
               <line x1="12" y1="8" x2="12" y2="16"></line>
@@ -1378,6 +1581,7 @@ function money(value: number) {
               <line x1="3" y1="10" x2="21" y2="10"></line>
             </svg>
             {{ item.transactionDate }} · 
+            <span class="badge" :class="'badge-' + item.status.toLowerCase()">{{ item.status }}</span> · 
             <span class="badge" :class="'badge-' + item.moneyType.toLowerCase()">{{ item.moneyType }}</span> · 
             {{ money(item.amount) }} UZS
           </span>

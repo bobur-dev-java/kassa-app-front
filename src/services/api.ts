@@ -1,6 +1,10 @@
 import type {
   AccessTokenRequest,
+  ActiveSeller,
   AuthClaims,
+  DailyMoneyAmount,
+  DailyProductQuantity,
+  DailyTransactionCount,
   DebitFilter,
   DebitResponse,
   HttpApiResponse,
@@ -21,6 +25,7 @@ import type {
   SystemInfoResponse,
   TelegramConnectResponse,
   TelegramLoginRequest,
+  TransactionAuditLogResponse,
   UserCreateRequest,
   UserProfileResponse,
   UserResponse,
@@ -404,6 +409,38 @@ export const yattAdminApi = {
     ),
   downloadDebitsExcel: (filter: DebitFilter = {}) =>
     downloadFile(withQuery('/api/yatt-admin/debits/excel', filter), 'debits.xlsx'),
+
+  // Confirm / Cancel
+  confirmProductTransaction: (id: number) =>
+    apiResponse<boolean>(`/api/yatt-admin/product-transaction/${id}/confirm`, { method: 'POST' }),
+  cancelProductTransaction: (id: number) =>
+    apiResponse<boolean>(`/api/yatt-admin/product-transaction/${id}/cancel`, { method: 'POST' }),
+  confirmMoneyTransaction: (id: number) =>
+    apiResponse<boolean>(`/api/yatt-admin/money-transaction/${id}/confirm`, { method: 'POST' }),
+  cancelMoneyTransaction: (id: number) =>
+    apiResponse<boolean>(`/api/yatt-admin/money-transaction/${id}/cancel`, { method: 'POST' }),
+
+  // Users by role
+  getStaff: (page = 0, size = 20, search?: string) =>
+    apiResponse<PageResponse<UserResponse>>(withQuery('/api/yatt-admin/users/staff', { page, size, search })),
+  getBigSellers: (page = 0, size = 20, search?: string) =>
+    apiResponse<PageResponse<UserResponse>>(withQuery('/api/yatt-admin/users/big-sellers', { page, size, search })),
+
+  // Audit Logs
+  getMoneyAuditLogs: (transactionId: number) =>
+    apiResponse<TransactionAuditLogResponse[]>(`/api/yatt-admin/audit/money/${transactionId}`),
+  getProductAuditLogs: (transactionId: number) =>
+    apiResponse<TransactionAuditLogResponse[]>(`/api/yatt-admin/audit/product/${transactionId}`),
+
+  // Analytics
+  getDailyTransactions: (date: string) =>
+    apiResponse<DailyTransactionCount>(withQuery('/api/yatt-admin/analytics/daily-transactions', { date })),
+  getDailyMoneyAmount: (date: string) =>
+    apiResponse<DailyMoneyAmount>(withQuery('/api/yatt-admin/analytics/daily-money-amount', { date })),
+  getDailyProductQuantity: (date: string) =>
+    apiResponse<DailyProductQuantity>(withQuery('/api/yatt-admin/analytics/daily-product-quantity', { date })),
+  getActiveSellers: (from: string, to: string) =>
+    apiResponse<ActiveSeller[]>(withQuery('/api/yatt-admin/analytics/active-sellers', { from, to })),
 }
 
 export const smallSellerApi = {
@@ -454,6 +491,10 @@ export const smallSellerApi = {
       withQuery('/api/small-seller/money-transactions/excel', filter),
       'money_transactions.xlsx',
     ),
+  confirmProductTransaction: (id: number) =>
+    apiResponse<boolean>(`/api/small-seller/product-transaction/${id}/confirm`, { method: 'POST' }),
+  cancelProductTransaction: (id: number) =>
+    apiResponse<boolean>(`/api/small-seller/product-transaction/${id}/cancel`, { method: 'POST' }),
 }
 
 export const bigSellerApi = {
@@ -501,4 +542,8 @@ export const bigSellerApi = {
   getDebits: (page = 0, size = 20) =>
     apiResponse<PageResponse<DebitResponse>>(withQuery('/api/big-seller/debits', { page, size })),
   downloadDebitsExcel: () => downloadFile('/api/big-seller/debits/excel', 'debits.xlsx'),
+  confirmMoneyTransaction: (id: number) =>
+    apiResponse<boolean>(`/api/big-seller/money-transaction/${id}/confirm`, { method: 'POST' }),
+  cancelMoneyTransaction: (id: number) =>
+    apiResponse<boolean>(`/api/big-seller/money-transaction/${id}/cancel`, { method: 'POST' }),
 }

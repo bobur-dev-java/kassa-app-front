@@ -13,6 +13,7 @@ import type {
   ProductTransactionResponse,
   UserProfileResponse,
   UserResponse,
+  TransactionStatus,
 } from '@/types/api'
 
 type TabKey = 'profile' | 'products' | 'money' | 'debits'
@@ -66,6 +67,7 @@ const commonFilter = reactive({
   from: '',
   to: '',
   isCompleted: null as boolean | null,
+  status: null as TransactionStatus | null,
   moneyType: '' as MoneyType | '',
 })
 
@@ -123,7 +125,7 @@ async function loadProducts() {
       toUserId: commonFilter.toUserId,
       from: commonFilter.from,
       to: commonFilter.to,
-      isCompleted: commonFilter.isCompleted,
+      status: commonFilter.status,
     },
     0,
     10,
@@ -138,7 +140,7 @@ async function loadMoney() {
       moneyType: commonFilter.moneyType,
       from: commonFilter.from,
       to: commonFilter.to,
-      isCompleted: commonFilter.isCompleted,
+      status: commonFilter.status,
     },
     0,
     10,
@@ -219,6 +221,26 @@ async function openMoneyTransactionDetail(id: number) {
     selectedMoneyTransaction.value = await bigSellerApi.getMoneyTransactionById(id)
     moneyMode.value = 'detail'
   }, false)
+}
+
+async function confirmMoneyTransaction(id: number) {
+  if (!window.confirm('Tranzaksiyani tasdiqlaysizmi?')) return
+  await runAction(async () => {
+    await bigSellerApi.confirmMoneyTransaction(id)
+    actionMessage.value = 'Tranzaksiya tasdiqlandi'
+    selectedMoneyTransaction.value = await bigSellerApi.getMoneyTransactionById(id)
+    await loadMoney()
+  })
+}
+
+async function cancelMoneyTransaction(id: number) {
+  if (!window.confirm('Tranzaksiyani bekor qilasizmi?')) return
+  await runAction(async () => {
+    await bigSellerApi.cancelMoneyTransaction(id)
+    actionMessage.value = 'Tranzaksiya bekor qilindi'
+    selectedMoneyTransaction.value = await bigSellerApi.getMoneyTransactionById(id)
+    await loadMoney()
+  })
 }
 
 function editProductTransaction() {
@@ -328,7 +350,7 @@ async function downloadActiveExcel() {
         toUserId: commonFilter.toUserId,
         from: commonFilter.from,
         to: commonFilter.to,
-        isCompleted: commonFilter.isCompleted,
+        status: commonFilter.status,
       })
     }
     if (activeTab.value === 'money') {
@@ -337,7 +359,7 @@ async function downloadActiveExcel() {
         moneyType: commonFilter.moneyType,
         from: commonFilter.from,
         to: commonFilter.to,
-        isCompleted: commonFilter.isCompleted,
+        status: commonFilter.status,
       })
     }
     if (activeTab.value === 'debits') {
@@ -545,8 +567,8 @@ function money(value: number) {
     >
       <div class="section-title">
         <h2>Tranzaksiya tafsilotlari #{{ selectedProductTransaction.id }}</h2>
-        <span class="badge" :class="selectedProductTransaction.isCompleted ? 'badge-completed' : 'badge-open'">
-          {{ selectedProductTransaction.isCompleted ? 'Completed' : 'Open' }}
+        <span class="badge" :class="'badge-' + selectedProductTransaction.status.toLowerCase()">
+          {{ selectedProductTransaction.status }}
         </span>
       </div>
       <div class="section-actions" style="margin-bottom: 20px;">
@@ -667,8 +689,8 @@ function money(value: number) {
     >
       <div class="section-title">
         <h2>Pul o'tkazmasi tafsilotlari #{{ selectedMoneyTransaction.id }}</h2>
-        <span class="badge" :class="selectedMoneyTransaction.isCompleted ? 'badge-completed' : 'badge-open'">
-          {{ selectedMoneyTransaction.isCompleted ? 'Completed' : 'Open' }}
+        <span class="badge" :class="'badge-' + selectedMoneyTransaction.status.toLowerCase()">
+          {{ selectedMoneyTransaction.status }}
         </span>
       </div>
       <div class="section-actions" style="margin-bottom: 20px;">
@@ -678,6 +700,25 @@ function money(value: number) {
             <polyline points="12 19 5 12 12 5"></polyline>
           </svg>
           Ortga
+        </button>
+        <button
+          v-if="selectedMoneyTransaction.status === 'PENDING'"
+          class="primary-small-button"
+          type="button"
+          :disabled="isLoading"
+          @click="confirmMoneyTransaction(selectedMoneyTransaction.id)"
+        >
+          Tasdiqlash
+        </button>
+        <button
+          v-if="selectedMoneyTransaction.status === 'PENDING'"
+          class="danger-button"
+          type="button"
+          :disabled="isLoading"
+          @click="cancelMoneyTransaction(selectedMoneyTransaction.id)"
+          style="min-height: 42px; font-size: 14px;"
+        >
+          Bekor qilish
         </button>
         <button class="ghost-button" type="button" @click="editMoneyTransaction">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="16" height="16">
@@ -804,10 +845,11 @@ function money(value: number) {
         </label>
         <label class="field">
           <span>Holati (Status)</span>
-          <select v-model="commonFilter.isCompleted">
+          <select v-model="commonFilter.status">
             <option :value="null">Hammasi</option>
-            <option :value="true">Completed</option>
-            <option :value="false">Open</option>
+            <option value="PENDING">Pending</option>
+            <option value="COMPLETED">Completed</option>
+            <option value="CANCELLED">Cancelled</option>
           </select>
         </label>
         <label class="field"><span>Dan (From)</span><input v-model="commonFilter.from" type="date" /></label>
@@ -839,6 +881,7 @@ function money(value: number) {
               <line x1="3" y1="10" x2="21" y2="10"></line>
             </svg>
             {{ item.transactionDate }} · 
+            <span class="badge" :class="'badge-' + item.status.toLowerCase()">{{ item.status }}</span> · 
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="14" height="14" style="color: var(--primary);">
               <circle cx="12" cy="12" r="10"></circle>
               <line x1="12" y1="8" x2="12" y2="16"></line>
@@ -865,6 +908,7 @@ function money(value: number) {
               <line x1="3" y1="10" x2="21" y2="10"></line>
             </svg>
             {{ item.transactionDate }} · 
+            <span class="badge" :class="'badge-' + item.status.toLowerCase()">{{ item.status }}</span> · 
             <span class="badge" :class="'badge-' + item.moneyType.toLowerCase()">{{ item.moneyType }}</span> · 
             {{ money(item.amount) }} UZS
           </span>

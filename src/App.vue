@@ -626,6 +626,16 @@ button.list-card:focus-visible {
   color: var(--warning);
 }
 
+.badge-pending {
+  background: var(--warning-bg);
+  color: var(--warning);
+}
+
+.badge-cancelled {
+  background: var(--danger-bg);
+  color: var(--danger);
+}
+
 .badge-cash {
   background: rgba(18, 124, 100, 0.1);
   color: var(--primary);

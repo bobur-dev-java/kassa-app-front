@@ -65,6 +65,8 @@ export type UserCreateRequest = {
 
 export type YaTTUserRole = 'ADMIN' | 'YATT_ADMIN' | 'SMALL_SELLER' | 'BIG_SELLER'
 
+export type TransactionStatus = 'PENDING' | 'COMPLETED' | 'CANCELLED'
+
 export type SystemInfoResponse = {
   userCount: number
   yattCount: number
@@ -152,7 +154,8 @@ export type ProductTransactionResponse = {
   toUserId: number
   transactionDate: string
   totalPrice: number
-  isCompleted: boolean
+  /** PENDING | COMPLETED | CANCELLED */
+  status: TransactionStatus
   products: ProductResponse[]
 }
 
@@ -161,7 +164,7 @@ export type ProductTransactionFilter = {
   toUserId?: number | null
   from?: string
   to?: string
-  isCompleted?: boolean | null
+  status?: TransactionStatus | null
 }
 
 export type MoneyType = 'CASH' | 'TERMINAL' | 'CARD'
@@ -183,7 +186,8 @@ export type MoneyTransactionResponse = {
   transactionDate: string
   amount: number
   moneyType: string
-  isCompleted: boolean
+  /** PENDING | COMPLETED | CANCELLED */
+  status: TransactionStatus
 }
 
 export type MoneyTransactionFilter = {
@@ -192,7 +196,7 @@ export type MoneyTransactionFilter = {
   moneyType?: MoneyType | ''
   from?: string
   to?: string
-  isCompleted?: boolean | null
+  status?: TransactionStatus | null
 }
 
 export type DebitResponse = {
@@ -204,4 +208,42 @@ export type DebitResponse = {
 
 export type DebitFilter = {
   fromUserId?: number | null
+}
+
+// ── Audit Logs ──────────────────────────────────────────────────────────
+
+export type TransactionAuditLogResponse = {
+  id: number
+  transactionId: number
+  transactionType: 'MONEY' | 'PRODUCT'
+  actionType: 'CREATE' | 'UPDATE' | 'COMPLETE' | 'CANCEL'
+  performedByUserId: number
+  performedAt: string
+  beforeState: string
+  afterState: string
+}
+
+// ── Analytics ───────────────────────────────────────────────────────────
+
+export type DailyTransactionCount = {
+  date: string
+  moneyCount: number
+  productCount: number
+}
+
+export type DailyMoneyAmount = {
+  date: string
+  totalAmount: number
+}
+
+export type DailyProductQuantity = {
+  date: string
+  totalQuantity: number
+}
+
+export type ActiveSeller = {
+  userId: number
+  fullName: string
+  transactionCount: number
+  totalAmount: number
 }
